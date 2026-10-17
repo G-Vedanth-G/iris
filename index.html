@@ -1,0 +1,3854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Locked scale to disable zooming while retaining standard scrollability -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Iris App Clone</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Poppins (matches the original app) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide outline icons for the module cards / category tabs -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+    <style>
+        /* Disables pinch-zoom and double-tap zoom gestures globally while keeping scrollability */
+        html {
+            touch-action: manipulation;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            background-color: var(--bg-dark); 
+            display: block;
+            margin: 0;
+            padding: 0;
+            overscroll-behavior-y: none;
+            touch-action: pan-y;
+        }
+
+        :root {
+            --bg-dark: #040404;
+            --card-bg: #181818;
+            --hostel-card-bg: #222225;
+            --header-band: #121317;
+            --ring-track: #b6c5c8;
+            --text-primary: #ffffff;
+            --text-secondary: #ffffff;
+            --accent-purple: #676fd1;
+            --nav-bg: #040404;
+            --alert-red: #ff453a;
+            --status-green: #34c759;
+            --teal-label: #4ac1e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-primary);
+        }
+
+        /* Mobile Container Stretched Full Screen */
+        .app-container {
+            width: 100%;
+            max-width: 100%;
+            height: 100vh;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 101px;
+            box-shadow: none;
+        }
+
+        /* Horizontal slide host: children swap with a slide animation */
+        .slide-host {
+            position: relative;
+            overflow-x: clip;
+        }
+
+        /* Main View Wrappers */
+        .view-section {
+            display: block;
+            width: 100%;
+            padding-bottom: 20px;
+        }
+
+        /* Header - True center logo via CSS grid */
+        .header {
+            display: grid;
+            grid-template-columns: 40px 1fr 40px;
+            align-items: center;
+            padding: 20px 20px 10px 20px;
+            width: 100%;
+        }
+
+        .header-center {
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-left-space {
+            width: 40px;
+        }
+
+        .logo {
+            font-size: 35px;
+            font-weight: 200;
+            letter-spacing: 15px;
+            padding-left: 15px; /* balances the trailing letter-spacing so the word is truly centered */
+            text-align: center;
+            grid-column: 2;
+            line-height: 1.2;
+        }
+        
+        .bell-container {
+            position: relative;
+            justify-self: end;
+            grid-column: 3;
+        }
+
+        .header .fa-bell {
+            font-size: 22px;
+            color: var(--accent-purple);
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--alert-red);
+            border-radius: 50%;
+        }
+
+        /* Section Headings */
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 15px 20px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Profile Card - Entire box clickable */
+        .profile-card {
+            background-color: var(--card-bg);
+            margin: 5px 20px 15px;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-card.no-arrow {
+            margin-top: 15px;
+            cursor: default;
+        }
+
+        .profile-img {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #fff;
+            cursor: pointer; 
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .profile-img:active {
+            opacity: 0.7;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+            padding-right: 15px;
+        }
+
+        .profile-info h3 {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .profile-info .subtext-line1 {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        .profile-info .subtext-line2 {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        .profile-card .fa-chevron-right {
+            position: absolute;
+            right: 20px;
+            color: var(--accent-purple);
+            padding: 10px; 
+        }
+
+        /* Dashboard Area */
+        .dashboard-grid {
+            display: flex;
+            gap: 10px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        /* 3D Flip Card Container */
+        .dash-card-container {
+            flex: 1;
+            perspective: 1000px;
+            min-height: 100px;
+            cursor: pointer;
+        }
+
+        .dash-card-flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .dash-card-container.flipped .dash-card-flipper {
+            transform: rotateY(180deg);
+        }
+
+        .dash-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .dash-card.back {
+            transform: rotateY(180deg);
+        }
+
+        .dash-card-header {
+            display: flex;
+            justify-content: space-between;
+            color: var(--accent-purple);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .dash-card-header i {
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .credits-val {
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .credits-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        /* Horizontal Scrollers */
+        .horizontal-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 20px 10px;
+            gap: 15px;
+            scrollbar-width: none; 
+        }
+        
+        .horizontal-scroll::-webkit-scrollbar {
+            display: none; 
+        }
+
+        /* Courses Cards */
+        .course-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            min-width: 170px;
+            max-width: 170px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-code {
+            color: var(--accent-purple);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .course-title {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.3;
+            flex-grow: 1;
+        }
+
+        .course-status {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .red-corner-tag {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-top: 20px solid var(--alert-red);
+        }
+
+        /* Favorite Screens */
+        .fav-card-add {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            min-width: 180px;
+            height: 80px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .fav-card-add span {
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .fav-card-add i {
+            color: var(--accent-purple);
+            font-size: 18px;
+        }
+
+        /* Floating Action Button (FAB) */
+        .fab {
+            position: fixed;
+            bottom: 109px; /* sits just above the 105px bottom nav */
+            right: 16.5px;
+            width: 54.5px;
+            height: 54.5px;
+            background-color: var(--accent-purple);
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 60;
+            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Pages that hide the bottom nav (profile, credits, hostel) */
+        .fab.low {
+            bottom: 50px;
+        }
+
+        .fab i {
+            color: white;
+            font-size: 24px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 100%;
+            height: 105px;
+            background-color: var(--nav-bg);
+            display: flex;
+            padding-top: 18px;
+            z-index: 10;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 11.4px;
+            line-height: 17px;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
+        .nav-icon {
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-icon svg {
+            width: 22px;
+            height: auto;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item span {
+            transition: font-size 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--accent-purple);
+            font-size: 13.2px;
+            font-weight: 500;
+        }
+
+        .nav-item.active span {
+            color: var(--accent-purple);
+        }
+
+        .nav-item.active .nav-icon svg {
+            transform: scale(1.35);
+        }
+
+        /* --- CATEGORIES VIEW SPECIFIC CSS --- */
+        /* Pinned block: logo, search and category tabs stay put; only the grids scroll beneath */
+        .cat-sticky {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background-color: var(--bg-dark);
+        }
+
+        .cat-header,
+        .page-header {
+            transition: background-color 0.2s;
+        }
+
+        .cat-header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cat-header .logo {
+            grid-column: auto;
+        }
+
+        .cat-header.scrolled,
+        .page-header.scrolled {
+            background-color: var(--header-band);
+        }
+
+        .search-container {
+            padding: 4px 16.5px 17px;
+        }
+
+        .search-box {
+            background-color: var(--card-bg);
+            height: 47.5px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            gap: 20px;
+        }
+
+        .search-icon {
+            color: var(--accent-purple);
+            font-size: 17px;
+            width: 18px;
+            text-align: center;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 11.8px;
+            letter-spacing: 0.1px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: #e4e4e6;
+            opacity: 1;
+        }
+
+        .top-cat-tabs {
+            display: flex;
+            padding: 0 12px;
+        }
+
+        .top-cat-tab {
+            flex: 1;
+            height: 66.5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 7.5px;
+            color: var(--accent-purple);
+            font-size: 13.2px;
+            font-weight: 500;
+            line-height: 20px;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background-color 0.25s, color 0.25s;
+        }
+
+        .top-cat-tab span {
+            color: inherit;
+            margin-top: 2.5px;
+        }
+
+        .top-cat-tab svg {
+            height: 26px;
+            width: auto;
+            color: inherit;
+        }
+
+        .top-cat-tab.active {
+            background-color: var(--accent-purple);
+            color: #ffffff;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14.5px 15px;
+            padding: 17px 16.5px 24px;
+        }
+
+        .mod-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            height: 92px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .mod-title {
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            bottom: 7px;
+            font-size: 11.7px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            line-height: 16px;
+        }
+
+        .mod-icon {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 28px;
+            height: 26px;
+            color: var(--accent-purple);
+        }
+
+        /* Outline icon style used throughout (sharp joins like the original icon set) */
+        svg.ic {
+            color: var(--accent-purple);
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: butt;
+            stroke-linejoin: miter;
+        }
+
+        /* Icon colors follow their container (the global * rule would force white) */
+        svg *,
+        svg.ic * {
+            color: inherit;
+        }
+
+        .top-cat-tab svg.ic {
+            color: inherit;
+        }
+
+        .nav-icon svg {
+            color: inherit;
+        }
+
+        .nav-item.active .nav-icon svg {
+            color: var(--accent-purple);
+        }
+
+        /* --- OVERLAY SCREENS CSS --- */
+
+        .page-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            z-index: 50;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex-direction: column;
+            padding-bottom: 0;
+        }
+
+        .page-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            flex-shrink: 0;
+            height: 56px;
+            display: grid;
+            grid-template-columns: 70px 1fr 70px;
+            align-items: center;
+            padding: 0 12px 0 14px;
+            font-size: 14.6px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .page-header > :last-child {
+            justify-self: end;
+        }
+
+        .page-header i {
+            color: var(--accent-purple);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding-left: 6px;
+            cursor: pointer;
+        }
+
+        .back-btn svg {
+            width: 8px;
+            height: 13px;
+            fill: none;
+            stroke: var(--accent-purple);
+            stroke-width: 2;
+        }
+
+        .hdr-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hdr-right svg {
+            display: block;
+        }
+
+        /* Tabs Navigation */
+        .tabs-container {
+            position: relative;
+            display: flex;
+            margin: 17px 12.5px 0;
+            flex-shrink: 0;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            height: 31.5px;
+            line-height: 31.5px;
+            padding: 0;
+            font-size: 13.3px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: var(--text-primary);
+        }
+
+        /* Sliding underline under the active tab */
+        .tab-indicator {
+            position: absolute;
+            bottom: 0;
+            left: calc(25% - 80px);
+            width: 160px;
+            height: 2px;
+            background-color: var(--accent-purple);
+            transition: left 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tabs-container.academics .tab-indicator {
+            left: calc(75% - 80px);
+        }
+
+        /* Details List Card */
+        .details-card {
+            background-color: var(--card-bg);
+            margin: 15px 20px;
+            border-radius: 12px;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        /* Profile page: card sits flush under the tabs and fills the screen */
+        .profile-page .slide-host {
+            flex: 1 0 auto;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 47px;
+        }
+
+        /* While sliding out, the old card keeps the same height as the new one */
+        .profile-page .details-card.sliding-out {
+            bottom: 0;
+        }
+
+        .profile-page .details-card {
+            flex: 1;
+            margin: 0 12.5px;
+            border-radius: 0 0 14px 14px;
+            padding: 9.6px 17px 20px;
+            gap: 15.7px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3.3px;
+        }
+
+        .detail-label {
+            font-size: 11.5px;
+            line-height: 16px;
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            font-size: 13.1px;
+            line-height: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Profile card on the details page (bigger photo, roomier text) */
+        .profile-card.no-arrow {
+            margin: 12px 12.5px 0;
+            height: 131.5px;
+            border-radius: 14px;
+            padding: 0 11.7px;
+            gap: 12.8px;
+            flex-shrink: 0;
+        }
+
+        .profile-card.no-arrow .profile-img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .profile-card.no-arrow .profile-info {
+            gap: 12px;
+            padding-right: 0;
+        }
+
+        .profile-card.no-arrow .profile-info h3 {
+            font-size: 13.2px;
+            font-weight: 600;
+            line-height: 19px;
+        }
+
+        .profile-card.no-arrow .profile-info p {
+            font-size: 13.6px;
+            line-height: 19px;
+        }
+
+        /* --- CREDITS TRACKER OVERLAY PAGE --- */
+        .tracker-top-card {
+            background-color: var(--card-bg);
+            margin: 12px 12.5px 0;
+            height: 292px;
+            border-radius: 14px;
+            display: grid;
+            grid-template-columns: 62% 38%;
+            flex-shrink: 0;
+        }
+
+        .tracker-left {
+            padding-top: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tracker-ring {
+            position: relative;
+            width: 156.5px;
+            height: 156.5px;
+        }
+
+        .tracker-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+            display: block;
+        }
+
+        .tracker-ring circle {
+            fill: none;
+            stroke-width: 5.3;
+        }
+
+        .tracker-ring .ring-track {
+            stroke: var(--ring-track);
+        }
+
+        .tracker-ring .ring-fill {
+            stroke: var(--accent-purple);
+        }
+
+        .tracker-pct {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18.3px;
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .tracker-label-bottom {
+            font-size: 15.2px;
+            line-height: 22.4px;
+            color: var(--text-primary);
+            margin-top: 17.6px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .tracker-right {
+            align-self: center;
+            margin-top: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tracker-stats-title {
+            font-size: 18.5px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 26.6px;
+            text-align: center;
+        }
+
+        .tracker-legend {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 9.7px;
+        }
+
+        .tracker-legend-dot {
+            width: 19.5px;
+            height: 19.5px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--card-bg) 0 3.2px, var(--accent-purple) 3.4px);
+            flex-shrink: 0;
+        }
+
+        .tracker-legend-major {
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .tracker-legend-val {
+            font-size: 15.2px;
+            line-height: 20px;
+            font-weight: 600;
+        }
+
+        .tracker-subtabs-row {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 22.6px;
+            flex-shrink: 0;
+        }
+
+        .tracker-subtab {
+            font-size: 13.3px;
+            line-height: 23px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tracker-subtab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-purple);
+        }
+
+        #trackerHost {
+            margin-top: 15.6px;
+        }
+
+        /* Category Breakdown List */
+        .tracker-category-card {
+            background-color: var(--card-bg);
+            margin: 0 12.5px 14px;
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tracker-cat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .tracker-cat-pct {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .tracker-progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background-color: #2c2c2e;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .tracker-progress-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        /* Semester Breakdown Chart */
+        /* Semester chart: 8.83px per credit, baseline 253.5px from the card top */
+        .tracker-chart-card {
+            position: relative;
+            background-color: var(--card-bg);
+            margin: 0 12.5px;
+            height: 325px;
+            border-radius: 14px;
+        }
+
+        .chart-grid-line {
+            position: absolute;
+            left: 44px;
+            right: 7.5px;
+            border-top: 1px dashed #535456;
+            pointer-events: none;
+        }
+
+        .chart-y-label {
+            position: absolute;
+            left: 0;
+            width: 34.6px;
+            text-align: right;
+            font-size: 13.5px;
+            line-height: 16px;
+        }
+
+        .chart-plot {
+            position: absolute;
+            left: 58.4px;
+            right: 14px;
+            top: 0;
+            height: 253.5px;
+            display: flex;
+        }
+
+        .chart-bar-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        .chart-bar {
+            width: 20px;
+            background-color: var(--accent-purple);
+            border-radius: 5px;
+            transform-origin: bottom;
+            animation: barGrow 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+
+        @keyframes barGrow {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            top: 256px;
+            font-size: 13.5px;
+            line-height: 14px;
+            color: var(--text-primary);
+        }
+
+        .chart-title-bottom {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 292px;
+            text-align: center;
+            font-size: 15.4px;
+            line-height: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* --- HOSTEL DASHBOARD SPECIFIC CSS --- */
+        .hostel-subtabs-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 10px 20px;
+            background-color: var(--bg-dark);
+        }
+        .hostel-subtabs-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hostel-subtabs {
+            display: inline-flex;
+            gap: 10px;
+            align-items: center;
+            background-color: transparent;
+        }
+
+        .hostel-subtab {
+            padding: 10px 20px;
+            background-color: transparent;
+            border-radius: 24px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .hostel-subtab.active {
+            background-color: var(--accent-purple);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .hostel-fixed-top {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-dark);
+            z-index: 20;
+            width: 100%;
+        }
+
+        .hostel-id-card {
+            background-color: var(--hostel-card-bg);
+            margin: 10px 20px;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+        }
+
+        .id-card-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .id-card-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #fff;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .id-card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+        }
+
+        .id-card-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .id-card-hostel {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .id-card-mess {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .id-card-roll {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .id-card-actions {
+            position: absolute;
+            right: 20px;
+            top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .id-card-actions i {
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .authorities-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 15px 20px 10px;
+            background-color: var(--bg-dark);
+        }
+
+        .authorities-header i {
+            font-size: 15px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .authority-card {
+            background-color: var(--card-bg);
+            margin: 10px 20px;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .auth-title {
+            font-size: 13px;
+            color: var(--teal-label);
+            font-weight: 600;
+        }
+
+        .auth-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .auth-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .auth-row i {
+            color: var(--accent-purple);
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .auth-emails, .auth-phones {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* --- MESS MENU TAB STYLES --- */
+        .mess-councillor-card {
+            background-color: var(--card-bg);
+            margin: 10px 20px 15px;
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border: 1px solid #2c2c2e;
+        }
+
+        .councillor-title {
+            font-size: 13px;
+            color: var(--teal-label);
+            font-weight: 600;
+        }
+
+        .councillor-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .councillor-row i {
+            color: var(--accent-purple);
+            font-size: 14px;
+        }
+
+        .mess-dropdown-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            margin: 10px 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .mess-carousel-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 15px;
+            padding: 10px 20px 20px;
+            scrollbar-width: none;
+            scroll-behavior: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .mess-carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mess-menu-card {
+            background-color: var(--card-bg);
+            min-width: calc(100vw - 40px);
+            max-width: calc(100vw - 40px);
+            flex: 0 0 calc(100vw - 40px);
+            scroll-snap-align: center;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .mess-date-header {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2c2c2e;
+        }
+
+        .meal-box {
+            background-color: #222225;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .meal-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meal-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--teal-label);
+        }
+
+        .meal-time {
+            font-size: 12px;
+            color: #ff9f0a;
+            font-weight: 600;
+        }
+
+        .meal-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* --- ALLOTMENTS TAB STYLES --- */
+        .allotment-subtabs-row {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 20px 20px;
+            border-bottom: 1px solid #2c2c2e;
+        }
+
+        .allotment-subtab {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding-bottom: 8px;
+            position: relative;
+        }
+
+        .allotment-subtab.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .allotment-subtab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-purple);
+        }
+
+        .timeline-container {
+            padding: 30px 10px;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 115px 36px 1fr;
+            align-items: flex-start;
+            margin-bottom: 36px;
+            position: relative;
+        }
+
+        .timeline-time {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding-right: 14px;
+            line-height: 1.4;
+        }
+
+        .timeline-track {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .timeline-track::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: -36px;
+            width: 4px;
+            background-color: var(--accent-purple);
+            border-radius: 2px;
+        }
+
+        .timeline-item:last-child .timeline-track::before {
+            bottom: 10px;
+        }
+
+        .timeline-node {
+            position: relative;
+            z-index: 2;
+            width: 18px;
+            height: 18px;
+            background-color: var(--bg-dark);
+            border: 3px solid var(--accent-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        .timeline-node::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background-color: var(--accent-purple);
+            border-radius: 50%;
+        }
+
+        .timeline-content {
+            padding-left: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .timeline-semester {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .timeline-desc {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-allocated {
+            color: var(--status-green) !important;
+        }
+
+        .status-deallocated {
+            color: var(--alert-red) !important;
+        }
+
+        /* --- MESS FINANCE TAB STYLES --- */
+        .finance-balance-card {
+            text-align: center;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .finance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--status-green);
+        }
+
+        .finance-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .finance-filters-row {
+            display: flex;
+            gap: 10px;
+            padding: 0 20px 20px;
+            align-items: center;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .finance-filters-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .finance-pill {
+            padding: 8px 18px;
+            background-color: transparent;
+            border: 1px solid var(--accent-purple);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .finance-pill.active {
+            background-color: var(--accent-purple);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .finance-year-dropdown {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 8px 12px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+        }
+
+        /* Image Viewer Modal Styles (Highest Z-index) */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            flex-direction: column;
+        }
+
+        .modal-header-bar {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            padding-top: 40px; 
+        }
+
+        .modal-header-bar i {
+            color: var(--accent-purple);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 10px;
+            margin-left: -10px;
+        }
+
+        .modal-title {
+            flex: 1;
+            text-align: center;
+            color: #d1d1d1;
+            font-size: 14px;
+            margin-right: 20px; 
+        }
+
+        .full-screen-img {
+            margin: auto 0;
+            width: 100%;
+            height: auto;
+            background-color: white;
+            object-fit: contain;
+        }
+
+        /* ======================================================= */
+        /* ADDITIONS: logo image, splash, skeletons, new screens    */
+        /* ======================================================= */
+
+        /* Light theme (Settings > Light / System) */
+        :root[data-theme="light"] {
+            --bg-dark: #f4f4f7;
+            --card-bg: #ffffff;
+            --hostel-card-bg: #ececf1;
+            --header-band: #e9e9f0;
+            --text-primary: #16161a;
+            --text-secondary: #16161a;
+            --nav-bg: #f4f4f7;
+            --ring-track: #cfd6e6;
+        }
+
+        :root[data-theme="light"] .logo-img,
+        :root[data-theme="light"] .splash-purple img { filter: none; }
+        :root[data-theme="light"] .logo-img { filter: invert(1); }
+        :root[data-theme="light"] .meal-box,
+        :root[data-theme="light"] .timeline-node { background-color: #ececf1; }
+        :root[data-theme="light"] .nav-item { color: #16161a; }
+        :root[data-theme="light"] .skel { background: linear-gradient(100deg, #e6e6ec 30%, #f4f4f8 50%, #e6e6ec 70%); background-size: 200% 100%; }
+
+        .logo-img {
+            height: 35px;
+            width: auto;
+            display: block;
+            justify-self: center;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .home-header {
+            display: grid;
+            grid-template-columns: 48px 1fr 48px;
+            align-items: center;
+            height: 56px;
+            padding: 0 12px;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background-color: var(--bg-dark);
+            transition: background-color 0.2s;
+        }
+
+        .home-header.scrolled {
+            background-color: var(--header-band);
+        }
+
+        .home-header .fa-bell {
+            font-size: 22px;
+            color: var(--accent-purple);
+        }
+
+        .home-header .bell-container {
+            justify-self: end;
+            cursor: pointer;
+            padding: 8px 4px 8px 12px;
+            grid-column: 3;
+        }
+
+        .home-content {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .home-content .section-title:first-child {
+            padding-top: 6px;
+        }
+
+        .star-ic {
+            width: 21px;
+            height: 21px;
+            vertical-align: middle;
+        }
+
+        .dash-divider {
+            width: 3px;
+            align-self: stretch;
+            margin: 0 -4px;
+            background-color: #2a2a2d;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* Courses cards (centered text when there is no attendance yet) */
+        .course-card {
+            cursor: pointer;
+            min-height: 108px;
+        }
+
+        .course-card.no-att .course-title {
+            text-align: center;
+            font-weight: 400;
+            align-self: stretch;
+        }
+
+        .course-card.no-att .course-status {
+            text-align: center;
+            font-size: 10.5px;
+            opacity: 0.9;
+        }
+
+        .course-title {
+            font-weight: 400;
+        }
+
+        .att-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+
+        .att-row b { font-weight: 600; color: #e8761e; }
+        .att-bar { height: 4px; border-radius: 2px; background: #4a4a4a; overflow: hidden; }
+        .att-bar i { display: block; height: 100%; background: #e8761e; }
+
+        /* Announcements */
+        .announce-card {
+            margin: 0 20px;
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 15px 16px 13px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .announce-tag {
+            color: var(--accent-purple);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .announce-title {
+            font-size: 13.5px;
+            font-weight: 500;
+            line-height: 1.45;
+            padding-right: 52px;
+        }
+
+        .announce-date {
+            font-size: 10.5px;
+            opacity: 0.8;
+        }
+
+        /* Announcement detail page */
+        .news-meta {
+            margin: 12px 12.5px 0;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px 14px 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .news-date { font-size: 11.5px; }
+        .news-title { font-size: 14.5px; font-weight: 500; line-height: 1.45; }
+        .news-foot { display: flex; gap: 22px; font-size: 11.5px; opacity: 0.85; align-items: center; }
+        .news-foot span { display: flex; gap: 6px; align-items: center; }
+        .news-foot svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; color: inherit; }
+
+        /* Course status modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.62);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-dialog {
+            width: min(332px, calc(100vw - 52px));
+            background-color: #232326;
+            border-radius: 28px;
+            padding: 22px 26px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        :root[data-theme="light"] .status-dialog { background-color: #ffffff; }
+
+        .dlg-row { display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; }
+        .dlg-row.title { font-weight: 600; }
+        .dlg-ok { color: #34c759; font-weight: 400; }
+        .dlg-bad { color: #ff453a; font-weight: 400; }
+        .dlg-checks { display: flex; justify-content: space-between; align-items: center; }
+        .dlg-checks .lines { display: flex; flex-direction: column; gap: 2px; font-size: 13.5px; }
+        .dlg-checks .lines span { display: flex; align-items: center; gap: 12px; }
+        .dlg-check { width: 22px; height: 22px; stroke: #34c759; fill: none; stroke-width: 3.2; color: #34c759; }
+        .dlg-hr { height: 1px; background: #3a3a3c; margin: 6px 0 4px; }
+        .dlg-att { text-align: center; display: flex; flex-direction: column; gap: 5px; font-size: 13px; }
+        .dlg-att .big { font-size: 20px; font-weight: 300; }
+        .dlg-att .warn { color: #e8761e; font-size: 13px; }
+        .dlg-btns { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .dlg-btn { border: none; border-radius: 18px; height: 36px; padding: 0 22px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+        .dlg-btn.grey { background: #48484a; color: #fff; }
+        .dlg-btn.purple { background: var(--accent-purple); color: #fff; }
+
+        /* Splash screen */
+        #splash {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        #splash .splash-robot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 138px;
+            height: auto;
+            transform: translate(-50%, -54%);
+            animation: robotBob 1.3s ease-in-out infinite alternate;
+        }
+
+        #splash.phase2 .splash-robot {
+            animation: robotLeave 0.7s cubic-bezier(0.5, 0, 0.9, 0.4) forwards;
+        }
+
+        .splash-purple {
+            position: absolute;
+            inset: 0;
+            background: #5c63cc;
+            clip-path: circle(0% at 50% 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #splash.phase2 .splash-purple {
+            animation: purpleGrow 0.8s 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .splash-purple img {
+            width: 90px;
+            height: auto;
+            opacity: 0;
+            transform: scale(0.85);
+        }
+
+        #splash.phase2 .splash-purple img {
+            animation: logoIn 0.6s 1.0s ease-out forwards;
+        }
+
+        #splash.hide {
+            opacity: 0;
+            transition: opacity 0.45s ease;
+            pointer-events: none;
+        }
+
+        @keyframes robotBob {
+            from { transform: translate(-50%, -54%); }
+            to { transform: translate(-50%, -49%); }
+        }
+
+        @keyframes robotLeave {
+            to { transform: translate(-50%, -190%) scale(0.7); opacity: 0; }
+        }
+
+        @keyframes purpleGrow {
+            to { clip-path: circle(150% at 50% 50%); }
+        }
+
+        @keyframes logoIn {
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Shimmer skeletons shown while a screen "loads" */
+        .skeleton-layer {
+            display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: var(--bg-dark);
+            z-index: 25;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+
+        .skeleton-layer.below-header {
+            top: 56px;
+        }
+
+        .skeleton-layer.fade {
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .skel {
+            background: linear-gradient(100deg, #181818 30%, #2a2a2c 50%, #181818 70%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s linear infinite;
+            border-radius: 14px;
+        }
+
+        @keyframes shimmer {
+            from { background-position: 200% 0; }
+            to { background-position: -200% 0; }
+        }
+
+        .skel-row { display: flex; gap: 12px; }
+        .skel-row .skel { flex: 1; }
+
+        /* Bottom nav: outline when inactive, filled when active + ripple */
+        .nav-item {
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            overflow: visible;
+        }
+
+        .nav-icon svg .on { display: none; }
+        .nav-item.active .nav-icon svg .on { display: inline; }
+        .nav-item.active .nav-icon svg .off { display: none; }
+
+        .nav-ripple {
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            margin-left: -40px;
+            border-radius: 50%;
+            background: rgba(120, 124, 170, 0.28);
+            transform: scale(0);
+            opacity: 1;
+            animation: ripple 0.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to { transform: scale(1); opacity: 0; }
+        }
+
+        .fab.dragging {
+            transition: none;
+            cursor: grabbing;
+        }
+
+        .fab {
+            touch-action: none;
+            user-select: none;
+        }
+
+        /* Settings (More) view */
+        .version-strip {
+            background-color: #2b2b2e;
+            text-align: center;
+            font-size: 12.5px;
+            padding: 7px 0;
+            margin-bottom: 6px;
+        }
+
+        :root[data-theme="light"] .version-strip { background-color: #e0e0e8; }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 14px 12px;
+        }
+
+        .settings-group {
+            margin: 0 14px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            height: 55px;
+            padding: 0 18px;
+            font-size: 13.5px;
+            border-bottom: 1px solid var(--bg-dark);
+            cursor: pointer;
+        }
+
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item:active { background: rgba(120, 124, 170, 0.12); }
+
+        .settings-item svg {
+            width: 21px;
+            height: 21px;
+            stroke: var(--accent-purple);
+            fill: none;
+            stroke-width: 1.7;
+            color: var(--accent-purple);
+            flex-shrink: 0;
+        }
+
+        .theme-toggle {
+            display: flex;
+            margin: 12px 14px 8px;
+            border: 1px solid var(--accent-purple);
+            border-radius: 20px;
+            overflow: hidden;
+            height: 38px;
+        }
+
+        .theme-opt {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--accent-purple);
+            cursor: pointer;
+        }
+
+        .theme-opt span { color: inherit; }
+        .theme-opt svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; color: inherit; }
+
+        .theme-opt.active {
+            background-color: #000;
+            color: #fff;
+        }
+
+        :root[data-theme="light"] .theme-opt.active { background-color: #16161a; }
+
+        .settings-subtitle {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 18px 14px 12px;
+        }
+
+        .settings-card-pad { margin-top: 6px; }
+
+        /* Notifications page */
+        .notif-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 14px 90px;
+        }
+
+        .notif-count { font-size: 11px; margin: 8px 0 10px; }
+
+        .notif-buttons { display: flex; gap: 22px; margin-bottom: 14px; }
+
+        .notif-btn {
+            border: none;
+            height: 36px;
+            border-radius: 18px;
+            padding: 0 26px;
+            font-size: 11.5px;
+            font-weight: 500;
+            color: #fff;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .notif-btn.green { background-color: #1fa83a; }
+        .notif-btn.purple { background-color: var(--accent-purple); }
+        .notif-btn span { color: #fff; }
+
+        .notif-legend {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 22px;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .notif-legend div { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .notif-legend i { width: 9px; height: 9px; border-radius: 50%; display: block; }
+
+        .notif-week { font-size: 9.5px; letter-spacing: 0.4px; margin-bottom: 14px; }
+        .notif-empty { margin-top: 70px; font-size: 12px; opacity: 0.8; }
+
+        .bottom-action {
+            position: sticky;
+            bottom: 14px;
+            margin: auto 14px 14px;
+            align-self: stretch;
+            height: 44px;
+            border: none;
+            border-radius: 24px;
+            background-color: var(--accent-purple);
+            color: #fff;
+            font-size: 11.5px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            font-family: inherit;
+            cursor: pointer;
+            flex-shrink: 0;
+            z-index: 5;
+        }
+
+        .bottom-action span { color: #fff; }
+        .page-overlay > .bottom-action { position: sticky; }
+
+        /* Academic Calendar */
+        .cal-card {
+            margin: 12px 12.5px 0;
+            background-color: var(--card-bg);
+            border-radius: 18px;
+            padding: 14px 8px 12px;
+        }
+
+        .cal-top {
+            display: grid;
+            grid-template-columns: 40px 1fr auto 40px;
+            align-items: center;
+            padding: 0 4px;
+            margin-bottom: 6px;
+        }
+
+        .cal-top .nav-btn {
+            background: none;
+            border: none;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .cal-top .nav-btn svg { width: 9px; height: 15px; stroke: var(--accent-purple); fill: none; stroke-width: 2.2; color: var(--accent-purple); }
+        .cal-month { font-size: 14px; text-align: center; padding-left: 40px; }
+        .cal-pill { border: 1px solid var(--accent-purple); color: var(--accent-purple); border-radius: 14px; padding: 4px 12px; font-size: 11px; margin-right: 6px; }
+        .cal-pill span { color: inherit; }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            row-gap: 2px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .cal-dow { font-size: 12px; opacity: 0.35; height: 34px; line-height: 34px; }
+
+        .cal-day {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .cal-day span {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12.5px;
+            transition: background-color 0.2s;
+        }
+
+        .cal-day.weekend span { opacity: 0.35; }
+        .cal-day.today span { background-color: var(--accent-purple); color: #fff; opacity: 1; }
+        .cal-day.selected span { box-shadow: inset 0 0 0 1.5px var(--accent-purple); opacity: 1; }
+        .cal-day.today.selected span { box-shadow: none; }
+
+        .cal-events-title { text-align: center; font-size: 13px; margin: 30px 0 0; }
+        .cal-events-empty { text-align: center; font-size: 11.5px; opacity: 0.85; margin-top: 62px; }
+
+        /* Credits: pinned top card + scrolling category list */
+        .tracker-page { overflow: hidden !important; }
+
+        .tracker-page #trackerHost {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 15.6px;
+            padding-bottom: 20px;
+            scrollbar-width: none;
+        }
+
+        .tracker-page #trackerHost::-webkit-scrollbar { display: none; }
+
+        .tracker-category-card {
+            margin: 0 12.5px 14px;
+            border-radius: 14px;
+            padding: 12px 13px 14px;
+            gap: 4px;
+        }
+
+        .cat-row { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; line-height: 21px; }
+        .cat-row .name { font-weight: 500; }
+        .cat-row .earned { font-size: 12px; }
+        .cat-row .pct { font-size: 12.5px; }
+        .cat-row .frac { font-size: 13px; font-weight: 500; }
+        .cat-bar { height: 3px; border-radius: 2px; background: #4a4a4c; margin-top: 3px; overflow: hidden; }
+        .cat-bar i { display: block; height: 100%; border-radius: 2px; transform-origin: left; animation: barGrowX 0.7s cubic-bezier(0.4, 0, 0.2, 1) both; }
+        @keyframes barGrowX { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+        .c-green { color: #2bb543; } .bg-green { background: #2bb543; }
+        .c-orange { color: #e8761e; } .bg-orange { background: #e8761e; }
+        .c-red { color: #ff453a; } .bg-red { background: #ff453a; }
+
+        /* Hostel ID card + tabs polish */
+        .hostel-id-card .id-card-title {
+            text-align: center;
+            font-size: 13.5px;
+            font-weight: 400;
+        }
+
+        .id-card-photo-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .id-card-photo-col .id-card-roll { font-size: 12.5px; font-weight: 400; }
+
+        .id-card-top { align-items: flex-start; }
+
+        .mess-flag {
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            border: 1.5px solid #ff453a;
+            border-radius: 2px;
+            position: relative;
+            vertical-align: -1px;
+            margin-left: 4px;
+        }
+
+        .mess-flag::after { content: ''; position: absolute; inset: 2px; background: #ff453a; border-radius: 1px; }
+
+        .mess-dropdown-banner {
+            background-color: transparent;
+            justify-content: center;
+            position: relative;
+            font-size: 12.5px;
+            font-weight: 400;
+            margin: 4px 20px 6px;
+            padding: 10px 0;
+        }
+
+        .mess-dropdown-banner i { position: absolute; right: 8px; }
+
+        .mess-councillor-card { border-color: #34346e; }
+        .councillor-row:last-child span { color: #4b4f9c; }
+
+        /* Complaints tab */
+        .complaint-subtabs {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            margin: 12px 0 0;
+        }
+
+        .complaint-subtab {
+            font-size: 12.5px;
+            line-height: 24px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .complaint-subtab.active::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; bottom: -2px;
+            height: 2px;
+            background: var(--accent-purple);
+        }
+
+        .complaint-head {
+            margin: 18px 12.5px 10px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 14px 14px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        .complaint-empty {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 190px;
+        }
+
+        .hostel-page-pad { padding-bottom: 80px; }
+
+        .finance-year-row {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 24px 0 20px;
+            margin-top: -4px;
+        }
+
+        .finance-year-row .finance-year-dropdown {
+            margin-left: 0;
+            background: transparent;
+            padding: 8px 0;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Splash: mascot on white, then purple wipe with the wordmark -->
+<div id="splash">
+    <img class="splash-robot" src="assets/robot.png" alt="">
+    <div class="splash-purple"><img src="assets/splash-logo.png" alt="IRIS"></div>
+</div>
+
+<div class="app-container">
+    
+    <!-- Image Viewer Modal Overlay -->
+    <div id="imageModal" class="image-modal">
+        <div class="modal-header-bar">
+            <i class="fa-solid fa-chevron-left" onclick="closeImageModal()"></i>
+            <span class="modal-title">student_dashboard_21643</span>
+        </div>
+        <img src="photo.jpg" alt="Full Profile Photo" class="full-screen-img" onerror="this.src='https://i.pravatar.cc/150?img=11'">
+    </div>
+
+    <!-- Profile Details Overlay Page -->
+    <div id="profileDetailsPage" class="page-overlay profile-page">
+        <!-- Inner Header -->
+        <div class="page-header">
+            <button class="back-btn" onclick="closeProfileDetails()" aria-label="Back"><svg viewBox="0 0 8 13"><polyline points="7,1 1.5,6.5 7,12"/></svg></button>
+            <span>Profile</span>
+            <svg width="21" height="12" viewBox="0 0 21 12" fill="none" stroke="#676fd1" stroke-width="1.8"><polyline points="6.5,1 1,6 6.5,11"/><polyline points="14.5,1 20,6 14.5,11"/></svg>
+        </div>
+
+        <!-- Inner Profile Card -->
+        <div class="profile-card no-arrow">
+            <img src="photo.jpg" alt="Profile" class="profile-img" onclick="openImageModal()" onerror="this.src='https://i.pravatar.cc/150?img=11'">
+            <div class="profile-info">
+                <h3>G Vedanth</h3>
+                <p class="subtext-line1">B Tech, 4th Year, 7th Semester</p>
+                <p class="subtext-line2">Electronics and Communication Engineering</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container" id="profileTabs">
+            <div class="tab active" id="tab-personal" onclick="switchTab('personal')">Personal</div>
+            <div class="tab" id="tab-academics" onclick="switchTab('academics')">Academics</div>
+            <span class="tab-indicator"></span>
+        </div>
+
+        <div class="slide-host" id="profileHost">
+        <!-- Personal Details List -->
+        <div id="personal-details" class="details-card">
+            <div class="detail-item">
+                <span class="detail-label">Father's Name</span>
+                <span class="detail-value">G Anand</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Date of Birth</span>
+                <span class="detail-value">17-3-2005</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Gender</span>
+                <span class="detail-value">Male</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Blood Group</span>
+                <span class="detail-value">O+</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Nationality</span>
+                <span class="detail-value">India</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Religion</span>
+                <span class="detail-value">Hindu</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value">8296040037</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Parent's Phone Number</span>
+                <span class="detail-value">9845440729</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Email</span>
+                <span class="detail-value">vedanth791@gmail.com</span>
+            </div>
+        </div>
+
+        <!-- Academics Details List (Hidden by default) -->
+        <div id="academics-details" class="details-card" style="display: none;">
+            <div class="detail-item">
+                <span class="detail-label">Roll Number</span>
+                <span class="detail-value">231EC216</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Registration Number</span>
+                <span class="detail-value">2310769</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Semester</span>
+                <span class="detail-value">7</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Branch</span>
+                <span class="detail-value">Electronics and Communication Engineering</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Degree</span>
+                <span class="detail-value">B Tech</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Category</span>
+                <span class="detail-value">General</span>
+            </div>
+        </div>
+        </div>
+    </div>
+    <!-- End Profile Details Overlay -->
+
+    <!-- ============================================== -->
+    <!-- CREDITS TRACKER OVERLAY PAGE                   -->
+    <!-- ============================================== -->
+    <div id="creditsTrackerPage" class="page-overlay tracker-page">
+        <div class="page-header">
+            <button class="back-btn" onclick="closeCreditsTracker()" aria-label="Back"><svg viewBox="0 0 8 13"><polyline points="7,1 1.5,6.5 7,12"/></svg></button>
+            <span>Credits Tracker</span>
+            <div class="hdr-right">
+                <!-- PDF export icon -->
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#676fd1" stroke-width="1.8"><path d="M3 5v14h14"/><rect x="6" y="2" width="14" height="14" rx="1.5"/><text x="13" y="11.8" font-size="5.6" font-weight="700" text-anchor="middle" fill="#676fd1" stroke="none" font-family="Poppins, sans-serif">PDF</text></svg>
+                <!-- overflow menu -->
+                <svg width="17" height="4" viewBox="0 0 17 4" fill="#676fd1"><circle cx="2" cy="2" r="2"/><circle cx="8.5" cy="2" r="2"/><circle cx="15" cy="2" r="2"/></svg>
+            </div>
+        </div>
+
+        <!-- Top Progress Summary Card -->
+        <div class="tracker-top-card">
+            <div class="tracker-left">
+                <div class="tracker-ring">
+                    <!-- r = 75.6, circumference = 475.0; 81% filled starting from 12 o'clock -->
+                    <svg viewBox="0 0 156.5 156.5">
+                        <circle class="ring-track" cx="78.25" cy="78.25" r="75.6"></circle>
+                        <circle class="ring-fill" id="ringFill" cx="78.25" cy="78.25" r="75.6" stroke-dasharray="475.0" stroke-dashoffset="475.0"></circle>
+                    </svg>
+                    <span class="tracker-pct">81.0%</span>
+                </div>
+                <div class="tracker-label-bottom">Credits<br>Completed</div>
+            </div>
+            <div class="tracker-right">
+                <div class="tracker-stats-title">Total<br>Credits</div>
+                <div class="tracker-legend">
+                    <div class="tracker-legend-dot"></div>
+                    <div>
+                        <div class="tracker-legend-major">Major</div>
+                        <div class="tracker-legend-val">131/161</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subtabs: Semester Breakdown vs Category Breakdown -->
+        <div class="tracker-subtabs-row">
+            <div class="tracker-subtab active" id="trackerSubSem" onclick="switchTrackerSubTab('semester')">Semester Breakdown</div>
+            <div class="tracker-subtab" id="trackerSubCat" onclick="switchTrackerSubTab('category')">Category Breakdown</div>
+        </div>
+
+        <div class="slide-host" id="trackerHost">
+            <!-- SEMESTER BREAKDOWN VIEW (Chart, built from data in JS) -->
+            <div id="trackerSectionSem" class="tracker-content-section">
+                <div class="tracker-chart-card" id="semChart"></div>
+            </div>
+
+            <!-- CATEGORY BREAKDOWN VIEW (built from data in JS) -->
+            <div id="trackerSectionCat" class="tracker-content-section" style="display: none;"></div>
+        </div>
+
+        <div class="skeleton-layer below-header" id="creditsSkeleton">
+            <div class="skel" style="height:292px;margin:12px -7.5px 0"></div>
+            <div class="skel" style="height:30px;width:150px;margin:24px auto 0;border-radius:16px"></div>
+            <div class="skel" style="height:300px;margin:16px -7.5px 0"></div>
+        </div>
+    </div>
+    <!-- End Credits Tracker Page -->
+
+    <!-- ============================================== -->
+    <!-- HOSTEL DASHBOARD OVERLAY PAGE                  -->
+    <!-- ============================================== -->
+    <div id="hostelDashboardPage" class="page-overlay">
+        
+        <!-- Fixed Top Header + Subtabs -->
+        <div class="hostel-fixed-top">
+            <div class="page-header">
+                <button class="back-btn" onclick="closeHostelDashboard()" aria-label="Back"><svg viewBox="0 0 8 13"><polyline points="7,1 1.5,6.5 7,12"/></svg></button>
+                <span>Hostel Dashboard</span>
+                <svg width="21" height="12" viewBox="0 0 21 12" fill="none" stroke="#676fd1" stroke-width="1.8"><polyline points="6.5,1 1,6 6.5,11"/><polyline points="14.5,1 20,6 14.5,11"/></svg>
+            </div>
+
+            <div class="hostel-subtabs-wrapper">
+                <div class="hostel-subtabs">
+                    <div class="hostel-subtab active" id="hSubHome" onclick="switchHostelTab('home')">Home</div>
+                    <div class="hostel-subtab" id="hSubMess" onclick="switchHostelTab('mess')">Mess Menu</div>
+                    <div class="hostel-subtab" id="hSubAllotments" onclick="switchHostelTab('allotments')">Allotments</div>
+                    <div class="hostel-subtab" id="hSubComplaints" onclick="switchHostelTab('complaints')">Complaints</div>
+                    <div class="hostel-subtab" id="hSubFinance" onclick="switchHostelTab('finance')">Mess Finance</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-host" id="hostelHost">
+        <!-- TAB 1: HOME -->
+        <div id="hostelTabHome" class="hostel-tab-content">
+            <div class="hostel-id-card">
+                <div class="id-card-title">Hostel & Mess ID Card</div>
+                <div class="id-card-top">
+                    <div class="id-card-photo-col">
+                        <img src="photo.jpg" alt="Profile" class="id-card-img" onclick="openImageModal()" onerror="this.src='https://i.pravatar.cc/150?img=11'">
+                        <div class="id-card-roll">231EC216</div>
+                    </div>
+                    <div class="id-card-details">
+                        <div class="id-card-name">G Vedanth</div>
+                        <div class="id-card-hostel">Kailash (MT-III) Room<br>B210</div>
+                        <div class="id-card-mess" style="margin-top: 4px;">Block IV Mess (Block IV)<span class="mess-flag"></span></div>
+                    </div>
+                </div>
+                
+                <div class="id-card-actions">
+                    <i class="fa-solid fa-download"></i>
+                    <i class="fa-solid fa-download" style="margin-top: 15px;"></i>
+                </div>
+            </div>
+
+            <div class="authorities-header">
+                <span>Hostel Authorities Contacts</span>
+                <i class="fa-regular fa-circle-question"></i>
+            </div>
+
+            <div class="authority-card">
+                <div class="auth-title">Q&M Warden</div>
+                <div class="auth-name">Sandi Kumar Reddy</div>
+                <div class="auth-row">
+                    <i class="fa-regular fa-envelope"></i>
+                    <div class="auth-emails">
+                        <span>skreddy@nitk.edu.in</span>
+                        <span>skreddy@nitk.edu.in</span>
+                    </div>
+                </div>
+                <div class="auth-row">
+                    <i class="fa-solid fa-phone"></i>
+                    <div class="auth-phones">
+                        <span>9448721700</span>
+                        <span>08242473395</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="authority-card">
+                <div class="auth-title">Hostel Block Warden</div>
+                <div class="auth-name">Abhilash M H</div>
+                <div class="auth-row">
+                    <i class="fa-regular fa-envelope"></i>
+                    <div class="auth-emails">
+                        <span>abhi@nitk.edu.in</span>
+                    </div>
+                </div>
+                <div class="auth-row">
+                    <i class="fa-solid fa-phone"></i>
+                    <div class="auth-phones">
+                        <span>9008712681</span>
+                        <span>+91-824-247300</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="authority-card">
+                <div class="auth-title">Hostel Block Warden</div>
+                <div class="auth-name">VIJAYA VENGADESH KUMAR J</div>
+                <div class="auth-row">
+                    <i class="fa-regular fa-envelope"></i>
+                    <div class="auth-emails">
+                        <span>vj@nitk.edu.in</span>
+                        <span>vj@nitk.edu.in</span>
+                    </div>
+                </div>
+                <div class="auth-row">
+                    <i class="fa-solid fa-phone"></i>
+                    <div class="auth-phones">
+                        <span>9786198855</span>
+                        <span>0824-2473041</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: MESS MENU -->
+        <div id="hostelTabMess" class="hostel-tab-content" style="display: none;">
+            <div class="mess-councillor-card">
+                <div class="councillor-title">Mess Councillor Details:</div>
+                <div class="councillor-row">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Vishnu Bendigeri</span>
+                </div>
+                <div class="councillor-row">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>vishnu.23ime361@nitk.edu.in</span>
+                </div>
+            </div>
+
+            <div class="mess-dropdown-banner">
+                <span>Block IV Mess</span>
+                <i class="fa-solid fa-chevron-down" style="color: var(--accent-purple);"></i>
+            </div>
+
+            <!-- Circular Infinite Snapping Carousel Container -->
+            <div class="mess-carousel-container" id="messCarousel">
+                
+                <!-- Set 1 (Cloned Prepend for Infinite Circular Scrolling) -->
+                <div class="mess-menu-card" data-card-id="sat-clone">
+                    <div class="mess-date-header">Saturday<br>3/10/2026</div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Breakfast</span><span class="meal-time">08:00-09:30</span></div>
+                        <div class="meal-desc">Aloo Paratha (2), Curd, Pickle, Bread, Butter, Jam And Ketchup, Tea/coffee, Milk With Bourn Vita, Egg Bhurji</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Lunch</span><span class="meal-time">12:00-14:00</span></div>
+                        <div class="meal-desc">Wheat Chapathi*, Rice (white & Boiled), Seasonal Veg Dry, Veg Kolhapuri, Sambhar, Curd, Salad, Chana Dal Tadka,</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Snacks</span><span class="meal-time">16:30-18:00</span></div>
+                        <div class="meal-desc">Mysore Bonda (3), Bread, Butter, Jam, Tea, Coffee</div>
+                    </div>
+                </div>
+
+                <!-- Sunday 27/9/2026 -->
+                <div class="mess-menu-card" data-card-id="sun">
+                    <div class="mess-date-header">Sunday<br>27/9/2026</div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Breakfast</span><span class="meal-time">08:00-09:30</span></div>
+                        <div class="meal-desc">Masala Dosa(1), Set Dosa(1), Chutney-sambar, Bread, Butter, Jam, Oats, Tea/coffee, Milk With Bourn Vita, Seasonal Fruits</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Lunch</span><span class="meal-time">12:00-14:00</span></div>
+                        <div class="meal-desc">Wheat Chapathi*, Rice (white & Boiled), Dal Fry, Tondekai Palya, Sambhar, Soyabean Masala, Curd, Papad, Salad, Sewai Kheer</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Snacks</span><span class="meal-time">16:30-18:00</span></div>
+                        <div class="meal-desc">Samosa, Chutney, Bread, Butter, Jam, Tea, Coffee</div>
+                    </div>
+                </div>
+
+                <!-- Tuesday 29/9/2026 -->
+                <div class="mess-menu-card" data-card-id="tue">
+                    <div class="mess-date-header">Tuesday<br>29/9/2026</div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Breakfast</span><span class="meal-time">7:00-9:30</span></div>
+                        <div class="meal-desc">Poori (4), Bhaji, Bread, Butter, Jam, Tea/coffee, Milk With Bourn Vita, Mix Sprouts (moong, Peanuts, Grams), Boiled Egg(1)</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Lunch</span><span class="meal-time">12:00-14:00</span></div>
+                        <div class="meal-desc">Wheat Chapathi*, Veg Pulao, Rice (white & Boiled), Yellow Dal, Sambhar, Beetroot Palya, Rajma Masala, Raita, Salad, Gulab Jamun</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Snacks</span><span class="meal-time">16:30-18:00</span></div>
+                        <div class="meal-desc">Veg Sevai Upma, Bread, Butter, Jam, Tea, Coffee</div>
+                    </div>
+                </div>
+
+                <!-- Wednesday 30/9/2026 -->
+                <div class="mess-menu-card" data-card-id="wed">
+                    <div class="mess-date-header">Wednesday<br>30/9/2026</div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Breakfast</span><span class="meal-time">7:00-9:30</span></div>
+                        <div class="meal-desc">Upma-shira, Chutney, Bread, Butter, Jam, Oats, Tea/coffee, Milk With Bourn Vita, Banana, Boiled Egg(1)</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Lunch</span><span class="meal-time">12:00-14:00</span></div>
+                        <div class="meal-desc">Methi Poori, Rice (white & Boiled), Sambhar, Aloo Shimla, Kabuli Chana Masala, Dal Fry, Papad, Chaas, Salad, Ice Cream(chocolate)</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Snacks</span><span class="meal-time">16:30-18:00</span></div>
+                        <div class="meal-desc">Veg Cutlet, Sauce, Bread, Butter, Jam, Tea, Coffee</div>
+                    </div>
+                </div>
+
+                <!-- Thursday 1/10/2026 -->
+                <div class="mess-menu-card" data-card-id="thu">
+                    <div class="mess-date-header">Thursday<br>1/10/2026</div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Breakfast</span><span class="meal-time">7:00-9:30</span></div>
+                        <div class="meal-desc">Onion Utthappam (1), Set Dosa(1), Chutney, Bread, Butter, Jam, Tea/coffee, Milk With Bourn Vita, Mix Sprouts (moong, Peanuts, Grams), Boiled Egg(1)</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Lunch</span><span class="meal-time">12:00-14:00</span></div>
+                        <div class="meal-desc">Wheat Chapathi*, Rice (white & Boiled), Veg Chawali Masala, Mixed Veg Dry, Sambhar, Curd, Pickle, Salad.</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Snacks</span><span class="meal-time">16:30-18:00</span></div>
+                        <div class="meal-desc">Pani Puri(6)/sev Puri, Bread, Butter, Jam, Tea, Coffee</div>
+                    </div>
+                </div>
+
+                <!-- Friday 2/10/2026 -->
+                <div class="mess-menu-card" data-card-id="fri">
+                    <div class="mess-date-header">Friday<br>2/10/2026</div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Breakfast</span><span class="meal-time">7:00-9:30</span></div>
+                        <div class="meal-desc">Poha-peanuts, Chutney, Bread, Butter, Jam, Cornflakes, Tea/coffee, Milk With Bourn Vita, Single Egg Omelet</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Lunch</span><span class="meal-time">12:00-14:00</span></div>
+                        <div class="meal-desc">Poori (unlimited), Jeera Rice, Rice (white & Boiled), Sambhar, Mutter Palak Masala, Dal Tadka, Lauki Dry, Buttermilk, Pickle, Papad, Salad, Ice Cream (special)</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Snacks</span><span class="meal-time">16:30-18:00</span></div>
+                        <div class="meal-desc">Goli Bajji(4), Chutney, Bread, Butter, Jam, Tea, Coffee</div>
+                    </div>
+                </div>
+
+                <!-- Saturday 3/10/2026 -->
+                <div class="mess-menu-card" data-card-id="sat">
+                    <div class="mess-date-header">Saturday<br>3/10/2026</div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Breakfast</span><span class="meal-time">08:00-09:30</span></div>
+                        <div class="meal-desc">Aloo Paratha (2), Curd, Pickle, Bread, Butter, Jam And Ketchup, Tea/coffee, Milk With Bourn Vita, Egg Bhurji</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Lunch</span><span class="meal-time">12:00-14:00</span></div>
+                        <div class="meal-desc">Wheat Chapathi*, Rice (white & Boiled), Seasonal Veg Dry, Veg Kolhapuri, Sambhar, Curd, Salad, Chana Dal Tadka,</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Snacks</span><span class="meal-time">16:30-18:00</span></div>
+                        <div class="meal-desc">Mysore Bonda (3), Bread, Butter, Jam, Tea, Coffee</div>
+                    </div>
+                </div>
+
+                <!-- Set 2 (Cloned Append for Infinite Circular Scrolling) -->
+                <div class="mess-menu-card" data-card-id="sun-clone">
+                    <div class="mess-date-header">Sunday<br>27/9/2026</div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Breakfast</span><span class="meal-time">08:00-09:30</span></div>
+                        <div class="meal-desc">Masala Dosa(1), Set Dosa(1), Chutney-sambar, Bread, Butter, Jam, Oats, Tea/coffee, Milk With Bourn Vita, Seasonal Fruits</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Lunch</span><span class="meal-time">12:00-14:00</span></div>
+                        <div class="meal-desc">Wheat Chapathi*, Rice (white & Boiled), Dal Fry, Tondekai Palya, Sambhar, Soyabean Masala, Curd, Papad, Salad, Sewai Kheer</div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title-row"><span class="meal-name">Snacks</span><span class="meal-time">16:30-18:00</span></div>
+                        <div class="meal-desc">Samosa, Chutney, Bread, Butter, Jam, Tea, Coffee</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB 3: ALLOTMENTS -->
+        <div id="hostelTabAllotments" class="hostel-tab-content" style="display: none;">
+            <div class="allotment-subtabs-row">
+                <div class="allotment-subtab active" id="allotSubMess" onclick="switchAllotmentSubTab('mess')">Mess Allotment</div>
+                <div class="allotment-subtab" id="allotSubHostel" onclick="switchAllotmentSubTab('hostel')">Hostel Allotment</div>
+            </div>
+
+            <div class="slide-host" id="allotHost">
+            <!-- MESS ALLOTMENT TIMELINE -->
+            <div id="timelineMess" class="timeline-container">
+                <div class="timeline-item">
+                    <div class="timeline-time">15-07-2026<br>10:30</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">Semester - 7</span>
+                        <span class="timeline-desc">Block IV Mess (Block IV)</span>
+                        <span class="timeline-desc status-allocated">Allocated</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">09-05-2026<br>06:30</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">Semester - 6</span>
+                        <span class="timeline-desc">Block IV Mess (Block IV)</span>
+                        <span class="timeline-desc status-deallocated">Deallocated</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">01-01-2026<br>10:30</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">Semester - 6</span>
+                        <span class="timeline-desc">Block IV Mess (Block IV)</span>
+                        <span class="timeline-desc status-allocated">Allocated</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">01-12-2025<br>15:56</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">Semester - 5</span>
+                        <span class="timeline-desc">Mega Mess (Near Mega Tower)</span>
+                        <span class="timeline-desc status-deallocated">Deallocated</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">17-07-2025<br>10:33</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">Semester - 5</span>
+                        <span class="timeline-desc">Mega Mess (Near Mega Tower)</span>
+                        <span class="timeline-desc status-allocated">Allocated</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HOSTEL ALLOTMENT TIMELINE -->
+            <div id="timelineHostel" class="timeline-container" style="display: none;">
+                <div class="timeline-item">
+                    <div class="timeline-time">15-07-2026<br>10:30</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">B210</span>
+                        <span class="timeline-desc">Kailash (MT-III)</span>
+                        <span class="timeline-desc status-allocated">Allocated</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">17-7-2025<br>10:30</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">D309</span>
+                        <span class="timeline-desc">Kailash (MT-III)</span>
+                        <span class="timeline-desc status-deallocated">Deallocated</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">18-7-2024<br>17:30</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">411</span>
+                        <span class="timeline-desc">Shivalik</span>
+                        <span class="timeline-desc status-deallocated">Deallocated</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">22-9-2023<br>12:24</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">246</span>
+                        <span class="timeline-desc">Sahyadri (Block VII)</span>
+                        <span class="timeline-desc status-deallocated">Deallocated</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">19-8-2023<br>11:42</div>
+                    <div class="timeline-track"><div class="timeline-node"></div></div>
+                    <div class="timeline-content">
+                        <span class="timeline-semester">212</span>
+                        <span class="timeline-desc">Sahyadri (Block VII)</span>
+                        <span class="timeline-desc status-deallocated">Deallocated</span>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: COMPLAINTS -->
+        <div id="hostelTabComplaints" class="hostel-tab-content" style="display: none;">
+            <div class="complaint-subtabs">
+                <div class="complaint-subtab active" id="compSubFiled" onclick="switchComplaintSubTab('filed')">Filed Complaints</div>
+                <div class="complaint-subtab" id="compSubBlock" onclick="switchComplaintSubTab('block')">All Block Complaints</div>
+            </div>
+            <div class="slide-host" id="complaintHost" style="min-height: 420px;">
+                <div id="complaintsFiled" class="complaint-empty">No Complaints filed yet</div>
+                <div id="complaintsBlock" style="display: none;">
+                    <div class="complaint-head"><span>Complaint Details</span><span>Status</span></div>
+                    <div class="complaint-empty" style="margin-top: 120px;">No Complaints found</div>
+                </div>
+            </div>
+            <button class="bottom-action" style="position: fixed; left: 14px; right: 82px; bottom: 50px; margin: 0; width: auto;"><span>Make a Complaint</span></button>
+        </div>
+
+        <!-- TAB 5: MESS FINANCE -->
+        <div id="hostelTabFinance" class="hostel-tab-content" style="display: none;">
+            <div class="finance-balance-card">
+                <div class="finance-amount">₹ 22561.0</div>
+                <div class="finance-label">Current Mess Balance</div>
+            </div>
+            <div class="finance-filters-row">
+                <div class="finance-pill active" onclick="selectFinancePill(this)">Jan-Apr</div>
+                <div class="finance-pill" onclick="selectFinancePill(this)">May-Aug</div>
+                <div class="finance-pill" onclick="selectFinancePill(this)">Sep-Dec</div>
+            </div>
+            <div class="finance-year-row">
+                <div class="finance-year-dropdown">
+                    <span>2026</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
+                </div>
+            </div>
+            <div class="details-card" style="text-align: center; color: var(--text-secondary); padding: 40px 20px; background: transparent; margin-top: 120px;">
+                <p>No transactions</p>
+            </div>
+        </div>
+        </div>
+
+        <div class="skeleton-layer" id="hostelSkeleton" style="top: 118px; position: fixed;">
+            <div class="skel" style="height:170px;margin-top:6px"></div>
+            <div class="skel" style="height:34px;width:60%;margin-top:22px"></div>
+            <div class="skel" style="height:150px;margin-top:20px"></div>
+        </div>
+
+    </div>
+    <!-- End Hostel Dashboard Page -->
+
+    <!-- ============================================== -->
+    <!-- NOTIFICATIONS PAGE                             -->
+    <!-- ============================================== -->
+    <div id="notificationsPage" class="page-overlay">
+        <div class="page-header">
+            <button class="back-btn" onclick="closeOverlay('notificationsPage')" aria-label="Back"><svg viewBox="0 0 8 13"><polyline points="7,1 1.5,6.5 7,12"/></svg></button>
+            <span>Notifications</span>
+            <svg width="21" height="12" viewBox="0 0 21 12" fill="none" stroke="#676fd1" stroke-width="1.8"><polyline points="6.5,1 1,6 6.5,11"/><polyline points="14.5,1 20,6 14.5,11"/></svg>
+        </div>
+        <div class="notif-body">
+            <div class="notif-count">You have 0 unread notifications</div>
+            <div class="notif-buttons">
+                <button class="notif-btn green"><span>Enable Notifications</span></button>
+                <button class="notif-btn purple"><span>My devices</span></button>
+            </div>
+            <div class="notif-legend">
+                <div><i style="background:#ff453a"></i><span>Urgent</span></div>
+                <div><i style="background:#676fd1"></i><span>General</span></div>
+                <div><i style="background:#8e8e93"></i><span>Previously<br>read</span></div>
+            </div>
+            <div class="notif-week">CURRENT WEEK</div>
+            <div class="notif-empty">No notifications</div>
+        </div>
+        <button class="bottom-action"><span>MARK ALL AS READ</span></button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- ANNOUNCEMENT DETAIL PAGE                       -->
+    <!-- ============================================== -->
+    <div id="newsPage" class="page-overlay">
+        <div class="page-header">
+            <button class="back-btn" onclick="closeOverlay('newsPage')" aria-label="Back"><svg viewBox="0 0 8 13"><polyline points="7,1 1.5,6.5 7,12"/></svg></button>
+            <span>Academic News</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#676fd1" stroke-width="2.2" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.6 15.4 6.4M8.6 13.4l6.8 4.2"/></svg>
+        </div>
+        <div class="news-meta">
+            <div class="news-date">September 21 , 2026 - 10 : 39 AM</div>
+            <div class="news-title">Student Medical Insurance, along with the SOP and claim forms</div>
+            <div class="news-foot">
+                <span><svg viewBox="0 0 24 24" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1.4" fill="currentColor"/></svg>Academic News</span>
+                <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.5V12l3.5 2"/></svg>0 min read</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- ACADEMIC CALENDAR PAGE                         -->
+    <!-- ============================================== -->
+    <div id="calendarPage" class="page-overlay">
+        <div class="page-header">
+            <button class="back-btn" onclick="closeOverlay('calendarPage')" aria-label="Back"><svg viewBox="0 0 8 13"><polyline points="7,1 1.5,6.5 7,12"/></svg></button>
+            <span>Academic Calendar</span>
+            <div class="hdr-right">
+                <svg width="19" height="15" viewBox="0 0 19 15" fill="none" stroke="#676fd1" stroke-width="2"><circle cx="2" cy="2" r="1.1" fill="#676fd1"/><circle cx="2" cy="7.500" r="1.1" fill="#676fd1"/><circle cx="2" cy="13" r="1.1" fill="#676fd1"/><path d="M6 2h12M6 7.500h12M6 13h12"/></svg>
+                <svg width="21" height="12" viewBox="0 0 21 12" fill="none" stroke="#676fd1" stroke-width="1.8"><polyline points="6.5,1 1,6 6.5,11"/><polyline points="14.5,1 20,6 14.5,11"/></svg>
+            </div>
+        </div>
+        <div class="cal-card">
+            <div class="cal-top">
+                <button class="nav-btn" onclick="calShift(-1)" aria-label="Previous month"><svg viewBox="0 0 9 15"><polyline points="7.5,1.500 1.500,7.500 7.500,13.500"/></svg></button>
+                <div class="cal-month" id="calMonthLabel">October 2026</div>
+                <div class="cal-pill"><span>Month</span></div>
+                <button class="nav-btn" onclick="calShift(1)" aria-label="Next month"><svg viewBox="0 0 9 15"><polyline points="1.500,1.500 7.500,7.500 1.500,13.500"/></svg></button>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+        </div>
+        <div class="cal-events-title">Academic Events</div>
+        <div class="cal-events-empty">No events for the day</div>
+    </div>
+
+    <!-- Course status dialog -->
+    <div class="modal-backdrop" id="courseModal" onclick="if(event.target===this)closeCourseModal()">
+        <div class="status-dialog" id="courseDialog"></div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MAIN HOME VIEW                                 -->
+    <!-- ============================================== -->
+    <div id="homeView" class="view-section">
+        <!-- Header: pinned, lighter band appears when content scrolls under it -->
+        <header class="home-header" id="homeHeader">
+            <div></div>
+            <img class="logo-img" src="assets/logo.png" alt="IRIS">
+            <div class="bell-container" onclick="openNotifications()" aria-label="Notifications">
+                <i class="fa-regular fa-bell"></i>
+            </div>
+        </header>
+
+        <div class="home-content" id="homeContent">
+        <!-- Profile Section -->
+        <h2 class="section-title">Profile</h2>
+        <div class="profile-card" onclick="openProfileDetails()">
+            <img src="photo.jpg" alt="Profile" class="profile-img" onclick="event.stopPropagation(); openImageModal();" onerror="this.src='https://i.pravatar.cc/150?img=11'">
+            <div class="profile-info">
+                <h3>G Vedanth</h3>
+                <p class="subtext-line1">B Tech, 4th Year, 7th Semester</p>
+                <p class="subtext-line2">Electronics and Communication Engineering</p>
+            </div>
+            <i class="fa-solid fa-chevron-right"></i>
+        </div>
+
+        <!-- Dashboard Section -->
+        <h2 class="section-title">Dashboard</h2>
+        <div class="dashboard-grid">
+            <!-- 3D Flip Credits Card (Clicking body opens Credits Tracker, arrow flips card) -->
+            <div class="dash-card-container" id="creditsCardContainer" onclick="openCreditsTracker()">
+                <div class="dash-card-flipper">
+                    <!-- FRONT SIDE (Credits) -->
+                    <div class="dash-card front">
+                        <div class="dash-card-header">
+                            <span style="color: var(--accent-purple);">Credits <i class="fa-solid fa-chart-column" style="font-size:12px; margin-left:4px; color: var(--accent-purple);"></i></span>
+                            <i class="fa-solid fa-arrow-right-arrow-left" onclick="toggleCreditsCard(event)"></i>
+                        </div>
+                        <div class="credits-val">131</div>
+                        <div class="credits-label">Major</div>
+                    </div>
+                    <!-- BACK SIDE (CGPA) -->
+                    <div class="dash-card back">
+                        <div class="dash-card-header">
+                            <span style="color: var(--accent-purple);">CGPA <i class="fa-solid fa-chart-column" style="font-size:12px; margin-left:4px; color: var(--accent-purple);"></i></span>
+                            <i class="fa-solid fa-arrow-right-arrow-left" onclick="toggleCreditsCard(event)"></i>
+                        </div>
+                        <div class="credits-val">8.4</div>
+                        <div class="credits-label">Major</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-divider"></div>
+
+            <!-- Hostel card clickable to open Hostel Dashboard -->
+            <div class="dash-card-container" onclick="openHostelDashboard()">
+                <div class="dash-card" style="position: relative;">
+                    <div class="dash-card-header">
+                        <span style="color: var(--accent-purple);">Hostel <i class="fa-regular fa-building" style="font-size:12px; margin-left:4px; color: var(--accent-purple);"></i></span>
+                    </div>
+                    <div class="credits-val" style="font-size: 15px;">Kailash (MT-III)</div>
+                    <div class="credits-label">Room Number B210</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses Section -->
+        <h2 class="section-title">Courses</h2>
+        <div class="horizontal-scroll">
+            <div class="course-card no-att" onclick="openCourseModal('EC357')">
+                <div class="course-code">EC357</div>
+                <div class="course-title">Adhoc and Sensor Networks</div>
+                <div class="course-status">Attendance not marked yet.</div>
+            </div>
+            <div class="course-card no-att" onclick="openCourseModal('EC840')">
+                <div class="red-corner-tag"></div>
+                <div class="course-code">EC840</div>
+                <div class="course-title">Millimeter Wave Communications</div>
+                <div class="course-status">Course has been dropp...</div>
+            </div>
+        </div>
+
+        <!-- Favorite Screens Section -->
+        <h2 class="section-title">Favorite Screens <svg class="star-ic" viewBox="0 0 24 24"><path fill="#fff" d="M12 1.500l3.200 6.700 7.300.9-5.400 5 1.400 7.300L12 17.800 5.500 21.400l1.400-7.300-5.400-5 7.300-.9z"/><circle cx="12" cy="12.500" r="3.200" fill="#040404"/></svg></h2>
+        <div class="horizontal-scroll">
+            <div class="fav-card-add">
+                <span>Add Favorite<br>Screens</span>
+                <i class="fa-solid fa-plus"></i>
+            </div>
+        </div>
+
+        <!-- Announcements Section -->
+        <h2 class="section-title">Announcements</h2>
+        <div class="announce-card" onclick="openOverlay('newsPage')">
+            <div class="announce-tag">Academic News</div>
+            <div class="announce-title">Student Medical Insurance, along with the SOP and claim forms</div>
+            <div class="announce-date">Updated at:&nbsp; September 21 , 2026 - 10 : 39 AM</div>
+        </div>
+
+        <!-- Loading placeholders -->
+        <div class="skeleton-layer" id="homeSkeleton">
+            <h2 class="section-title" style="padding-left:0">Profile</h2>
+            <div class="skel" style="height:98px"></div>
+            <h2 class="section-title" style="padding-left:0">Dashboard</h2>
+            <div class="skel-row"><div class="skel" style="height:96px"></div><div class="skel" style="height:96px"></div></div>
+            <h2 class="section-title" style="padding-left:0">Courses</h2>
+            <div class="skel-row"><div class="skel" style="height:108px"></div><div class="skel" style="height:108px"></div></div>
+            <h2 class="section-title" style="padding-left:0">Favorite Screens</h2>
+            <div class="skel-row"><div class="skel" style="height:80px"></div><div class="skel" style="height:80px"></div></div>
+        </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SETTINGS (MORE) VIEW                           -->
+    <!-- ============================================== -->
+    <div id="moreView" class="view-section" style="display: none;">
+        <header class="cat-header" id="moreHeader" style="position:sticky;top:0;z-index:30;background:var(--bg-dark)">
+            <img class="logo-img" src="assets/logo.png" alt="IRIS">
+        </header>
+        <div class="version-strip">v4.3.2</div>
+        <div class="settings-title">Settings</div>
+        <div class="theme-toggle" id="themeToggle">
+            <div class="theme-opt" data-theme-opt="light" onclick="setTheme('light')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.900 4.900l1.400 1.400M17.700 17.700l1.400 1.400M2 12h2M20 12h2M4.900 19.100l1.400-1.400M17.700 6.300l1.400-1.400"/></svg><span>Light</span></div>
+            <div class="theme-opt active" data-theme-opt="dark" onclick="setTheme('dark')"><svg viewBox="0 0 24 24"><path d="M21 12.800A9 9 0 1 1 11.200 3a7 7 0 0 0 9.800 9.800z"/></svg><span>Dark</span></div>
+            <div class="theme-opt" data-theme-opt="system" onclick="setTheme('system')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.400 15a1.700 1.700 0 0 0 .3 1.800l.1.1a2 2 0 1 1-2.800 2.800l-.1-.1a1.700 1.700 0 0 0-1.800-.3 1.700 1.700 0 0 0-1 1.500V21a2 2 0 0 1-4 0v-.1a1.700 1.700 0 0 0-1.100-1.500 1.700 1.700 0 0 0-1.800.3l-.1.1a2 2 0 1 1-2.800-2.800l.1-.1a1.700 1.700 0 0 0 .3-1.800 1.700 1.700 0 0 0-1.500-1H3a2 2 0 0 1 0-4h.1a1.700 1.700 0 0 0 1.500-1.100 1.700 1.700 0 0 0-.3-1.800l-.1-.1a2 2 0 1 1 2.800-2.800l.1.1a1.700 1.700 0 0 0 1.800.3H9a1.700 1.700 0 0 0 1-1.500V3a2 2 0 0 1 4 0v.1a1.700 1.700 0 0 0 1 1.500 1.700 1.700 0 0 0 1.800-.3l.1-.1a2 2 0 1 1 2.800 2.800l-.1.1a1.700 1.700 0 0 0-.3 1.800V9a1.700 1.700 0 0 0 1.500 1H21a2 2 0 0 1 0 4h-.1a1.700 1.700 0 0 0-1.500 1z"/></svg><span>System</span></div>
+        </div>
+        <div class="settings-group settings-card-pad">
+            <div class="settings-item"><i data-lucide="key-round"></i><span>Change Password</span></div>
+            <div class="settings-item" onclick="this.querySelector('svg').animate([{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:700,easing:'ease'})"><i data-lucide="refresh-cw"></i><span>Sync account</span></div>
+            <div class="settings-item"><i data-lucide="log-out"></i><span>Log out</span></div>
+        </div>
+        <div class="settings-subtitle">Miscellaneous</div>
+        <div class="settings-group">
+            <div class="settings-item"><i data-lucide="info"></i><span>About IRIS</span></div>
+            <div class="settings-item"><i data-lucide="mail"></i><span>Support</span></div>
+            <div class="settings-item"><i data-lucide="fingerprint"></i><span>Open Source Libraries</span></div>
+            <div class="settings-item"><i data-lucide="shield"></i><span>Data Protection Policy</span></div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- CATEGORIES VIEW                                -->
+    <!-- ============================================== -->
+    <div id="categoriesView" class="view-section" style="display: none;">
+        <!-- Pinned: logo, search and category tabs. Only the grids below scroll. -->
+        <div class="cat-sticky">
+            <header class="cat-header" id="catHeader">
+                <img class="logo-img" src="assets/logo.png" alt="IRIS">
+            </header>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" placeholder="Search Modules">
+                </div>
+            </div>
+
+            <!-- Top Categories Sub-Tabs -->
+            <div class="top-cat-tabs">
+                <div class="top-cat-tab" id="subTabInstitute" onclick="switchCategorySubTab('institute')">
+                    <i data-lucide="landmark" class="ic"></i>
+                    <span>Institute</span>
+                </div>
+                <div class="top-cat-tab active" id="subTabAcademics" onclick="switchCategorySubTab('academics')">
+                    <i data-lucide="graduation-cap" class="ic"></i>
+                    <span>Academics</span>
+                </div>
+                <div class="top-cat-tab" id="subTabCampus" onclick="switchCategorySubTab('campus')">
+                    <svg class="ic" viewBox="0 0 18 26" style="stroke:none;fill:currentColor"><path d="M9 1.2 11.4 4.6H6.6z"/><rect x="7" y="5.4" width="4" height="3"/><path d="M7.2 9.4h3.6l.8 3.4H6.4zM6 13.8h6l1 4H5zM4.8 18.8h8.4l1.4 6.4H3.4z"/><path d="M1 2.6l3.4 1.6M17 2.6l-3.4 1.6M9 0v1M3.4 7.2 5.8 6.6M14.6 7.2l-2.4-.6" style="stroke:currentColor;stroke-width:1.2;fill:none"/></svg>
+                    <span>Campus</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-host" id="catGridHost">
+
+        <!-- INSTITUTE GRID -->
+        <div id="gridInstitute" class="modules-grid" style="display: none;">
+            <div class="mod-card">
+                <span class="mod-title">Announcements</span>
+                <i data-lucide="megaphone" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">No Dues</span>
+                <i data-lucide="file-edit" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Useful Links</span>
+                <i data-lucide="link" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">IRIS Forms</span>
+                <i data-lucide="clipboard-list" class="mod-icon ic"></i>
+            </div>
+        </div>
+
+        <!-- ACADEMICS GRID -->
+        <div id="gridAcademics" class="modules-grid">
+            <div class="mod-card" onclick="openCalendar()">
+                <span class="mod-title">Academic Calendar</span>
+                <i data-lucide="calendar-days" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">My Courses and Grades</span>
+                <i data-lucide="files" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Course Registration</span>
+                <i data-lucide="clipboard-edit" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">All Courses</span>
+                <i data-lucide="book" class="mod-icon ic"></i>
+            </div>
+            <!-- Clicking My Credits Tracker opens Credits Tracker Page -->
+            <div class="mod-card" onclick="openCreditsTracker()">
+                <span class="mod-title">My Credits Tracker</span>
+                <i data-lucide="bar-chart-3" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">My Grade Card</span>
+                <i data-lucide="file-text" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Gyan</span>
+                <i data-lucide="lightbulb" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">My Timetable</span>
+                <i data-lucide="grid-3x3" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">My Attendance Card</span>
+                <i data-lucide="clipboard-check" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Feedback Forms</span>
+                <i data-lucide="file-plus-2" class="mod-icon ic"></i>
+            </div>
+        </div>
+
+        <!-- CAMPUS GRID -->
+        <div id="gridCampus" class="modules-grid" style="display: none;">
+            <div class="mod-card">
+                <span class="mod-title">Events Management</span>
+                <i data-lucide="calendar-days" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Infrastructure Booking</span>
+                <i data-lucide="building-2" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Buy and Sell</span>
+                <i data-lucide="shopping-cart" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Career Development Centre</span>
+                <svg class="mod-icon ic" viewBox="0 0 24 24"><path d="M2.5 2.5C6 4 8.5 3.6 12 2c3.5 1.6 6 2 9.500.5v9C21.500 17 17 20 12 22.500 7 20 2.500 17 2.500 11.500z"/><text x="12" y="13.500" font-size="6.200" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none" font-family="Poppins, sans-serif">CDC</text></svg>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Calendar and Events (CEMS)</span>
+                <i data-lucide="calendar-days" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card" onclick="openHostelDashboard()">
+                <span class="mod-title">Hostel Dashboard</span>
+                <svg class="mod-icon ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.500"/><circle cx="12" cy="12" r="1" fill="currentColor"/><path d="M12 1.500v6M12 16.500v6M1.500 12h6M16.500 12h6M9.500 1.500h5M9.500 22.500h5M1.500 9.500v5M22.500 9.500v5"/></svg>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Important Contacts</span>
+                <i data-lucide="contact" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">NITK Maps</span>
+                <i data-lucide="map-pin" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Eduroam Account</span>
+                <i data-lucide="radio-tower" class="mod-icon ic"></i>
+            </div>
+            <div class="mod-card">
+                <span class="mod-title">Guest House Booking</span>
+                <svg class="mod-icon ic" viewBox="0 0 24 24"><path d="M1.500 11.500 12 2l10.500 9.500"/><path d="M4 9.500V22h16V9.500"/><path d="M12 11c1.700 1 3.200.9 4.300.3v3.700c0 1.900-1.700 3.200-4.300 4.200-2.600-1-4.300-2.300-4.300-4.200v-3.700c1.100.6 2.600.7 4.300-.3z"/></svg>
+            </div>
+        </div>
+
+        </div>
+    </div>
+
+    <!-- Floating Action Button (Always Visible) -->
+    <div class="fab">
+        <i class="fa-solid fa-comment"></i>
+    </div>
+
+    <!-- Bottom Navigation (Always Visible) -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" id="navHomeBtn" onclick="switchView('home')">
+            <div class="nav-icon"><svg viewBox="0 1 24 22">
+                <g class="off" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M2.500 11.500 12 3l9.500 8.500"/><path d="M5 10v11h5v-6h4v6h5V10"/></g>
+                <g class="on" fill="currentColor"><path d="M12 1.800 1 11.500h3V22h6v-6.500h4V22h6V11.500h3z"/></g>
+            </svg></div>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" id="navCategoriesBtn" onclick="switchView('categories')">
+            <div class="nav-icon"><svg viewBox="0 0 24 21">
+                <g class="off" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="1" width="12" height="19"/><rect x="15.500" y="1" width="7.500" height="7"/><rect x="15.500" y="10.500" width="7.500" height="9.500"/><path d="M4 5h6M4 9h6" stroke-width="1.200"/></g>
+                <g class="on" fill="currentColor"><rect x="0" y="0" width="14" height="21"/><rect x="15.500" y="0" width="8.500" height="8"/><rect x="15.500" y="9.500" width="8.500" height="11.500"/></g>
+            </svg></div>
+            <span>Categories</span>
+        </div>
+        <div class="nav-item" id="navMoreBtn" onclick="switchView('more')">
+            <div class="nav-icon"><svg viewBox="0 0 24 20">
+                <g class="off" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="3" cy="3" r="1.900"/><circle cx="3" cy="10" r="1.900"/><circle cx="3" cy="17" r="1.900"/><path d="M9 3h14M9 10h14M9 17h14"/></g>
+                <g class="on" fill="currentColor" stroke="currentColor"><circle cx="3" cy="3" r="2.300"/><circle cx="3" cy="10" r="2.300"/><circle cx="3" cy="17" r="2.300"/><path d="M8.500 3h15M8.500 10h15M8.500 17h15" stroke-width="2.600" fill="none"/></g>
+            </svg></div>
+            <span>More</span>
+        </div>
+    </nav>
+
+</div>
+
+<!-- JavaScript to handle screen transitions, sub-tabs, and modals -->
+<script>
+    const EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
+    const DUR = 320;
+    const appEl = document.querySelector('.app-container');
+    const fabEl = document.querySelector('.fab');
+
+    /* ---------- Slide animation helper ----------
+       Swaps `outEl` for `inEl` inside `host` with a horizontal slide.
+       dir = +1: new content enters from the right, -1: from the left. */
+    function slideSwap(host, outEl, inEl, dir, show) {
+        if (!outEl || !inEl || outEl === inEl) return;
+        if (host._finishSlide) host._finishSlide();
+
+        const w = host.getBoundingClientRect().width;
+        inEl.style.display = show;
+
+        // Take the outgoing element out of flow so both overlap during the slide
+        outEl.style.position = 'absolute';
+        outEl.style.top = '0';
+        outEl.style.left = '0';
+        outEl.style.right = '0';
+        outEl.style.pointerEvents = 'none';
+        outEl.classList.add('sliding-out');
+
+        const opts = { duration: DUR, easing: EASE, fill: 'both' };
+        const a1 = outEl.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-dir * w) + 'px)' }], opts);
+        const a2 = inEl.animate([{ transform: 'translateX(' + (dir * w) + 'px)' }, { transform: 'translateX(0)' }], opts);
+
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            a1.cancel();
+            a2.cancel();
+            outEl.style.display = 'none';
+            outEl.classList.remove('sliding-out');
+            outEl.style.position = outEl.style.top = outEl.style.left = outEl.style.right = outEl.style.pointerEvents = '';
+            host._finishSlide = null;
+        };
+        host._finishSlide = finish;
+        a2.onfinish = finish;
+    }
+
+    /* ---------- Overlay pages (slide in from the right) ---------- */
+    function updateFab() {
+        const any = Array.from(document.querySelectorAll('.page-overlay'))
+            .some(o => o.style.display === 'flex' && !o._closing);
+        fabEl.classList.toggle('low', any);
+    }
+
+    function openOverlay(id) {
+        const el = document.getElementById(id);
+        if (el.style.display === 'flex' && !el._closing) return;
+        if (el._anim) el._anim.cancel();
+        el._closing = false;
+        el.style.display = 'flex';
+        el.scrollTop = 0;
+        const header = el.querySelector('.page-header');
+        if (header) header.classList.remove('scrolled');
+        el._anim = el.animate(
+            [{ transform: 'translateX(100%)' }, { transform: 'translateX(0)' }],
+            { duration: DUR, easing: EASE }
+        );
+        updateFab();
+    }
+
+    function closeOverlay(id, instant) {
+        const el = document.getElementById(id);
+        if (el.style.display !== 'flex' || el._closing) return;
+        if (el._anim) el._anim.cancel();
+        if (instant) {
+            el.style.display = 'none';
+            updateFab();
+            return;
+        }
+        el._closing = true;
+        updateFab();
+        const a = el.animate(
+            [{ transform: 'translateX(0)' }, { transform: 'translateX(100%)' }],
+            { duration: DUR, easing: EASE, fill: 'forwards' }
+        );
+        el._anim = a;
+        a.onfinish = () => {
+            a.cancel();
+            el.style.display = 'none';
+            el._closing = false;
+            updateFab();
+        };
+    }
+
+    function openImageModal() {
+        document.getElementById('imageModal').style.display = 'flex';
+    }
+    function closeImageModal() {
+        document.getElementById('imageModal').style.display = 'none';
+    }
+
+    function openProfileDetails() { openOverlay('profileDetailsPage'); }
+    function closeProfileDetails(instant) { closeOverlay('profileDetailsPage', instant === true); }
+
+    function openCreditsTracker() {
+        openOverlay('creditsTrackerPage');
+        showSkeleton('creditsSkeleton', 650);
+        const ring = document.getElementById('ringFill');
+        ring.style.transition = 'none';
+        ring.style.strokeDashoffset = RING_LEN;
+        setTimeout(() => { buildSemChart(); animateRing(); }, 620);
+    }
+    function closeCreditsTracker(instant) { closeOverlay('creditsTrackerPage', instant === true); }
+
+    function openHostelDashboard() {
+        openOverlay('hostelDashboardPage');
+        showSkeleton('hostelSkeleton', 650);
+        setTimeout(initMessCarousel, 50);
+    }
+    function closeHostelDashboard(instant) { closeOverlay('hostelDashboardPage', instant === true); }
+
+    // Toggle 3D Flip Card for Credits / CGPA
+    function toggleCreditsCard(event) {
+        event.stopPropagation();
+        const container = document.getElementById('creditsCardContainer');
+        container.classList.toggle('flipped');
+    }
+
+    /* ---------- Credits Tracker ---------- */
+    const RING_LEN = 475.0;
+
+    function animateRing() {
+        const ring = document.getElementById('ringFill');
+        ring.style.transition = 'none';
+        ring.style.strokeDashoffset = RING_LEN;
+        void ring.getBoundingClientRect();
+        ring.style.transition = 'stroke-dashoffset 0.9s ' + EASE;
+        ring.style.strokeDashoffset = RING_LEN * (1 - 131 / 161);
+    }
+
+    // Credits earned per semester (sums to 131)
+    function buildSemChart() {
+        const data = [23, 21, 20, 26, 22, 19];
+        const unit = 8.83;       // px per credit
+        const base = 253.5;      // baseline y inside the card
+        let html = '';
+        [25, 20, 15, 10, 5].forEach(v => {
+            html += '<div class="chart-grid-line" style="top:' + (base - v * unit).toFixed(1) + 'px"></div>';
+        });
+        [0, 5, 10, 15, 20, 25, 26].forEach(v => {
+            html += '<div class="chart-y-label" style="top:' + (base - v * unit - 8).toFixed(1) + 'px">' + v + '</div>';
+        });
+        html += '<div class="chart-plot">' + data.map((c, i) =>
+            '<div class="chart-bar-col"><div class="chart-bar" style="height:' + (c * unit).toFixed(1) +
+            'px;animation-delay:' + (i * 60) + 'ms"></div><span class="chart-bar-label">' + (i + 1) + '</span></div>'
+        ).join('') + '</div>';
+        html += '<div class="chart-title-bottom">Credits vs Semesters</div>';
+        document.getElementById('semChart').innerHTML = html;
+    }
+
+    // Credits Tracker Sub-tabs (Semester vs Category)
+    function switchTrackerSubTab(subTabName) {
+        const subSem = document.getElementById('trackerSubSem');
+        const subCat = document.getElementById('trackerSubCat');
+        const secSem = document.getElementById('trackerSectionSem');
+        const secCat = document.getElementById('trackerSectionCat');
+        const host = document.getElementById('trackerHost');
+        const goingToCat = subTabName === 'category';
+        if (goingToCat === subCat.classList.contains('active')) return;
+
+        subSem.classList.toggle('active', !goingToCat);
+        subCat.classList.toggle('active', goingToCat);
+        if (goingToCat) {
+            slideSwap(host, secSem, secCat, 1, 'block');
+        } else {
+            slideSwap(host, secCat, secSem, -1, 'block');
+        }
+    }
+
+    // Infinite Circular Carousel Scroll Handler
+    const carousel = document.getElementById('messCarousel');
+    let isInitialized = false;
+
+    function initMessCarousel() {
+        if (!carousel || isInitialized) return;
+        const firstRealCard = carousel.querySelector('[data-card-id="sun"]');
+        if (firstRealCard) {
+            carousel.scrollLeft = firstRealCard.offsetLeft - carousel.offsetLeft - 20;
+            isInitialized = true;
+        }
+    }
+
+    if (carousel) {
+        carousel.addEventListener('scroll', () => {
+            const scrollLeft = carousel.scrollLeft;
+            const cardWidth = carousel.querySelector('.mess-menu-card').offsetWidth + 15;
+
+            if (scrollLeft <= 5) {
+                const targetCard = carousel.querySelector('[data-card-id="sat"]');
+                carousel.scrollLeft = targetCard.offsetLeft - carousel.offsetLeft - 20;
+            }
+            else if (scrollLeft >= cardWidth * 6 - 10) {
+                const targetCard = carousel.querySelector('[data-card-id="sun"]');
+                carousel.scrollLeft = targetCard.offsetLeft - carousel.offsetLeft - 20;
+            }
+        });
+    }
+
+    /* ---------- Profile tabs ---------- */
+    function switchTab(tabName) {
+        const personalTab = document.getElementById('tab-personal');
+        const academicsTab = document.getElementById('tab-academics');
+        const personalDetails = document.getElementById('personal-details');
+        const academicsDetails = document.getElementById('academics-details');
+        const tabs = document.getElementById('profileTabs');
+        const host = document.getElementById('profileHost');
+        const toAcademics = tabName === 'academics';
+        if (toAcademics === academicsTab.classList.contains('active')) return;
+
+        academicsTab.classList.toggle('active', toAcademics);
+        personalTab.classList.toggle('active', !toAcademics);
+        tabs.classList.toggle('academics', toAcademics);
+
+        if (toAcademics) {
+            slideSwap(host, personalDetails, academicsDetails, 1, 'flex');
+        } else {
+            slideSwap(host, academicsDetails, personalDetails, -1, 'flex');
+        }
+    }
+
+    /* ---------- Hostel dashboard tabs ---------- */
+    const HOSTEL_TABS = [
+        ['home', 'hSubHome', 'hostelTabHome'],
+        ['mess', 'hSubMess', 'hostelTabMess'],
+        ['allotments', 'hSubAllotments', 'hostelTabAllotments'],
+        ['complaints', 'hSubComplaints', 'hostelTabComplaints'],
+        ['finance', 'hSubFinance', 'hostelTabFinance']
+    ];
+
+    function switchHostelTab(tabName) {
+        const curIdx = HOSTEL_TABS.findIndex(t => document.getElementById(t[1]).classList.contains('active'));
+        const newIdx = HOSTEL_TABS.findIndex(t => t[0] === tabName);
+        if (newIdx < 0 || newIdx === curIdx) return;
+
+        HOSTEL_TABS.forEach((t, i) => document.getElementById(t[1]).classList.toggle('active', i === newIdx));
+
+        const host = document.getElementById('hostelHost');
+        slideSwap(host, document.getElementById(HOSTEL_TABS[curIdx][2]), document.getElementById(HOSTEL_TABS[newIdx][2]),
+            newIdx > curIdx ? 1 : -1, 'block');
+
+        // Keep the active pill in view when the pill row scrolls horizontally
+        document.getElementById(HOSTEL_TABS[newIdx][1]).scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+
+        if (tabName === 'mess') {
+            showSkeleton('hostelSkeleton', 550);
+            setTimeout(initMessCarousel, 50);
+        }
+    }
+
+    function switchComplaintSubTab(which) {
+        const a = document.getElementById('compSubFiled');
+        const b = document.getElementById('compSubBlock');
+        const toBlock = which === 'block';
+        if (toBlock === b.classList.contains('active')) return;
+        b.classList.toggle('active', toBlock);
+        a.classList.toggle('active', !toBlock);
+        const filed = document.getElementById('complaintsFiled');
+        const block = document.getElementById('complaintsBlock');
+        const host = document.getElementById('complaintHost');
+        if (toBlock) slideSwap(host, filed, block, 1, 'block');
+        else slideSwap(host, block, filed, -1, 'block');
+    }
+
+    function selectFinancePill(el) {
+        document.querySelectorAll('.finance-pill').forEach(p => p.classList.toggle('active', p === el));
+    }
+
+    function switchAllotmentSubTab(subTabName) {
+        const allotSubMess = document.getElementById('allotSubMess');
+        const allotSubHostel = document.getElementById('allotSubHostel');
+        const timelineMess = document.getElementById('timelineMess');
+        const timelineHostel = document.getElementById('timelineHostel');
+        const host = document.getElementById('allotHost');
+        const toHostel = subTabName === 'hostel';
+        if (toHostel === allotSubHostel.classList.contains('active')) return;
+
+        allotSubHostel.classList.toggle('active', toHostel);
+        allotSubMess.classList.toggle('active', !toHostel);
+        if (toHostel) {
+            slideSwap(host, timelineMess, timelineHostel, 1, 'block');
+        } else {
+            slideSwap(host, timelineHostel, timelineMess, -1, 'block');
+        }
+    }
+
+    /* ---------- Home / Categories ---------- */
+    const VIEWS = [
+        ['home', 'homeView', 'navHomeBtn'],
+        ['categories', 'categoriesView', 'navCategoriesBtn'],
+        ['more', 'moreView', 'navMoreBtn']
+    ];
+
+    function switchView(viewName) {
+        closeProfileDetails(true);
+        closeHostelDashboard(true);
+        closeCreditsTracker(true);
+        ['notificationsPage', 'newsPage', 'calendarPage'].forEach(id => closeOverlay(id, true));
+
+        const cur = VIEWS.findIndex(v => document.getElementById(v[2]).classList.contains('active'));
+        const next = VIEWS.findIndex(v => v[0] === viewName);
+        if (next < 0 || next === cur) return;
+
+        VIEWS.forEach((v, i) => document.getElementById(v[2]).classList.toggle('active', i === next));
+
+        appEl.scrollTop = 0;
+        slideSwap(appEl, document.getElementById(VIEWS[cur][1]), document.getElementById(VIEWS[next][1]),
+            next > cur ? 1 : -1, 'block');
+    }
+
+    const CATEGORY_TABS = [
+        ['institute', 'subTabInstitute', 'gridInstitute'],
+        ['academics', 'subTabAcademics', 'gridAcademics'],
+        ['campus', 'subTabCampus', 'gridCampus']
+    ];
+
+    function switchCategorySubTab(subTabName) {
+        const curIdx = CATEGORY_TABS.findIndex(t => document.getElementById(t[1]).classList.contains('active'));
+        const newIdx = CATEGORY_TABS.findIndex(t => t[0] === subTabName);
+        if (newIdx < 0 || newIdx === curIdx) return;
+
+        CATEGORY_TABS.forEach((t, i) => document.getElementById(t[1]).classList.toggle('active', i === newIdx));
+
+        slideSwap(document.getElementById('catGridHost'),
+            document.getElementById(CATEGORY_TABS[curIdx][2]), document.getElementById(CATEGORY_TABS[newIdx][2]),
+            newIdx > curIdx ? 1 : -1, 'grid');
+    }
+
+    /* ---------- Header band: lighter header appears once content scrolls under it ---------- */
+    appEl.addEventListener('scroll', () => {
+        ['catHeader', 'homeHeader', 'moreHeader'].forEach(id =>
+            document.getElementById(id).classList.toggle('scrolled', appEl.scrollTop > 2));
+    });
+    document.getElementById('trackerHost').addEventListener('scroll', e => {
+        document.querySelector('#creditsTrackerPage .page-header').classList.toggle('scrolled', e.target.scrollTop > 2);
+    });
+    document.querySelectorAll('.page-overlay').forEach(o => {
+        o.addEventListener('scroll', () => {
+            const h = o.querySelector('.page-header');
+            if (h) h.classList.toggle('scrolled', o.scrollTop > 2);
+        });
+    });
+
+    /* ---------- Shimmer skeletons ---------- */
+    function showSkeleton(id, ms) {
+        const layer = document.getElementById(id);
+        if (!layer) return;
+        clearTimeout(layer._t1);
+        clearTimeout(layer._t2);
+        layer.classList.remove('fade');
+        layer.style.display = 'block';
+        layer._t1 = setTimeout(() => {
+            layer.classList.add('fade');
+            layer._t2 = setTimeout(() => {
+                layer.style.display = 'none';
+                layer.classList.remove('fade');
+            }, 260);
+        }, ms);
+    }
+
+    /* ---------- Splash: mascot on white -> purple wipe -> wordmark -> home placeholders ---------- */
+    (function runSplash() {
+        const splash = document.getElementById('splash');
+        if (!splash) return;
+        if (location.search.indexOf('nosplash') >= 0) {
+            splash.remove();
+            return;
+        }
+        setTimeout(() => splash.classList.add('phase2'), 1500);
+        setTimeout(() => showSkeleton('homeSkeleton', 1000), 3300);
+        setTimeout(() => splash.classList.add('hide'), 3500);
+        setTimeout(() => splash.remove(), 4100);
+    })();
+
+    /* ---------- Notifications, announcement page ---------- */
+    function openNotifications() { openOverlay('notificationsPage'); }
+
+    /* ---------- Course status dialog ---------- */
+    const COURSE_INFO = {
+        EC357: { status: 'Approved', ok: true },
+        EC840: { status: 'Dropped', ok: false }
+    };
+    const CHECK_SVG = '<svg class="dlg-check" viewBox="0 0 24 24"><path d="M3 12.500l6 6L21 6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    function openCourseModal(code) {
+        const info = COURSE_INFO[code];
+        if (!info) return;
+        const dlg = document.getElementById('courseDialog');
+        let html = '<div class="dlg-row title"><span>Course Status:</span><span class="' + (info.ok ? 'dlg-ok' : 'dlg-bad') + '">' + info.status + '</span></div>';
+        if (info.ok) {
+            html += '<div class="dlg-checks"><div class="lines"><span>Faculty Advisor ' + CHECK_SVG + '</span><span>Course Instructor ' + CHECK_SVG + '</span></div></div>';
+        } else {
+            html += '<div class="dlg-row" style="opacity:.8;font-size:12.5px">This course has been dropped.</div>';
+        }
+        html += '<div class="dlg-btns"><button class="dlg-btn grey" onclick="closeCourseModal()">View Course</button><button class="dlg-btn purple" onclick="closeCourseModal()">OK</button></div>';
+        dlg.innerHTML = html;
+        const modal = document.getElementById('courseModal');
+        modal.style.display = 'flex';
+        modal.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180 });
+        dlg.animate([{ transform: 'scale(0.88)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 220, easing: EASE });
+    }
+
+    function closeCourseModal() {
+        const modal = document.getElementById('courseModal');
+        const dlg = document.getElementById('courseDialog');
+        modal.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160 });
+        dlg.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.92)', opacity: 0 }], { duration: 160 })
+            .onfinish = () => { modal.style.display = 'none'; };
+    }
+
+    /* ---------- Academic Calendar ---------- */
+    const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const calNow = new Date();
+    let calY = calNow.getFullYear();
+    let calM = calNow.getMonth();
+    let calSel = null;
+
+    function buildCalendar() {
+        document.getElementById('calMonthLabel').textContent = MONTHS[calM] + ' ' + calY;
+        const first = (new Date(calY, calM, 1).getDay() + 6) % 7; // Monday first
+        const days = new Date(calY, calM + 1, 0).getDate();
+        let html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => '<div class="cal-dow">' + d + '</div>').join('');
+        for (let i = 0; i < first; i++) html += '<div></div>';
+        for (let d = 1; d <= days; d++) {
+            const col = (first + d - 1) % 7;
+            const isToday = d === calNow.getDate() && calM === calNow.getMonth() && calY === calNow.getFullYear();
+            const isSel = calSel && calSel.d === d && calSel.m === calM && calSel.y === calY;
+            html += '<div class="cal-day' + (col >= 5 ? ' weekend' : '') + (isToday ? ' today' : '') + (isSel ? ' selected' : '') +
+                '" onclick="calPick(' + d + ')"><span>' + d + '</span></div>';
+        }
+        document.getElementById('calGrid').innerHTML = html;
+    }
+
+    function calPick(d) { calSel = { d: d, m: calM, y: calY }; buildCalendar(); }
+
+    function calShift(delta) {
+        calM += delta;
+        if (calM < 0) { calM = 11; calY--; }
+        if (calM > 11) { calM = 0; calY++; }
+        buildCalendar();
+    }
+
+    function openCalendar() {
+        calY = calNow.getFullYear();
+        calM = calNow.getMonth();
+        buildCalendar();
+        openOverlay('calendarPage');
+    }
+
+    /* ---------- Credits: category breakdown ---------- */
+    const CATEGORIES = [
+        ['Program Core', 62, 62],
+        ['Mandatory Learning Course', 5, 16],
+        ['Major Project', 0, 6]
+    ];
+
+    function buildCategories() {
+        document.getElementById('trackerSectionCat').innerHTML = CATEGORIES.map(c => {
+            const pct = c[2] ? (c[1] / c[2]) * 100 : 0;
+            const tone = pct >= 75 ? 'green' : (pct >= 50 ? 'orange' : 'red');
+            return '<div class="tracker-category-card">' +
+                '<div class="cat-row"><span class="name">' + c[0] + '</span><span class="earned">Credits Earned:</span></div>' +
+                '<div class="cat-row"><span class="pct c-' + tone + '">' + pct.toFixed(2) + '%</span><span class="frac">' + c[1] + '/' + c[2] + '</span></div>' +
+                '<div class="cat-bar"><i class="bg-' + tone + '" style="width:' + pct + '%"></i></div></div>';
+        }).join('');
+    }
+
+    /* ---------- Theme (Light / Dark / System) ---------- */
+    function applyTheme(mode) {
+        const effective = mode === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+            : mode;
+        document.documentElement.setAttribute('data-theme', effective);
+        document.querySelectorAll('.theme-opt').forEach(o => o.classList.toggle('active', o.dataset.themeOpt === mode));
+    }
+
+    function setTheme(mode) {
+        try { localStorage.setItem('iris-theme', mode); } catch (e) {}
+        applyTheme(mode);
+    }
+
+    (function initTheme() {
+        let saved = 'dark';
+        try { saved = localStorage.getItem('iris-theme') || 'dark'; } catch (e) {}
+        applyTheme(saved);
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+            let m = 'dark';
+            try { m = localStorage.getItem('iris-theme') || 'dark'; } catch (e) {}
+            if (m === 'system') applyTheme('system');
+        });
+    })();
+
+    /* ---------- Bottom nav ripple ---------- */
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('pointerdown', () => {
+            const r = document.createElement('span');
+            r.className = 'nav-ripple';
+            item.appendChild(r);
+            setTimeout(() => r.remove(), 520);
+        });
+    });
+
+    /* ---------- Draggable chat button (snaps to the nearest screen edge) ---------- */
+    (function dragFab() {
+        let sx, sy, ox, oy, down = false, moved = false;
+        const margin = 16.5;
+        fabEl.addEventListener('pointerdown', e => {
+            down = true;
+            moved = false;
+            sx = e.clientX;
+            sy = e.clientY;
+            const r = fabEl.getBoundingClientRect();
+            ox = r.left;
+            oy = r.top;
+            fabEl.setPointerCapture(e.pointerId);
+        });
+        fabEl.addEventListener('pointermove', e => {
+            if (!down) return;
+            const dx = e.clientX - sx, dy = e.clientY - sy;
+            if (!moved && Math.hypot(dx, dy) < 5) return;
+            if (!moved) {
+                moved = true;
+                fabEl.classList.add('dragging');
+                fabEl.style.right = 'auto';
+                fabEl.style.bottom = 'auto';
+            }
+            const w = fabEl.offsetWidth, h = fabEl.offsetHeight;
+            fabEl.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, ox + dx)) + 'px';
+            fabEl.style.top = Math.max(8, Math.min(window.innerHeight - h - 8, oy + dy)) + 'px';
+        });
+        const end = () => {
+            if (!down) return;
+            down = false;
+            if (!moved) return;
+            fabEl.classList.remove('dragging');
+            const w = fabEl.offsetWidth;
+            const center = fabEl.getBoundingClientRect().left + w / 2;
+            const target = center < window.innerWidth / 2 ? margin : window.innerWidth - w - margin;
+            fabEl.style.transition = 'left 0.25s ' + EASE;
+            fabEl.style.left = target + 'px';
+            setTimeout(() => { fabEl.style.transition = ''; }, 280);
+        };
+        fabEl.addEventListener('pointerup', end);
+        fabEl.addEventListener('pointercancel', end);
+    })();
+
+    buildSemChart();
+    buildCategories();
+    if (window.lucide) lucide.createIcons();
+</script>
+
+</body>
+</html>
